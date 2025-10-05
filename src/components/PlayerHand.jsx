@@ -8,8 +8,6 @@ const PlayerHand = ({ cards, setCards, gameStats, setGameStats }) => {
 
   playerCards.sort((a, b) => a.cardNumber - b.cardNumber);
 
-  console.log(playerCards);
-
   return (
     <>
       <div className=" mt-2.5 bg-black/01 p-1 px-1.5 grid grid-cols-12 gap-1 ml-2.5 mt-0.5 h-19/20 w-69/70 backdrop-blur-sm  justify-center items-center rounded-xl  border-black/20 border-2 shadow-lg shadow-black/30  ">
@@ -29,7 +27,7 @@ const PlayerHand = ({ cards, setCards, gameStats, setGameStats }) => {
             ) : (
               <div
                 key={ind}
-                className="border w-full h-full border-white border-dashed rounded-xl hover:scale-125"
+                className="border w-full h-full border-black border-dashed rounded-xl "
               ></div>
             ),
           )}

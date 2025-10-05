@@ -43,3 +43,8 @@
 
 - Add multiplayer Support.
 - Add AI Arena where different Algorithms compete against one another.
+
+#### To Do :
+
+- add cards distribution animation.
+- Add Tyepcheck using typescript.

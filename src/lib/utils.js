@@ -94,3 +94,26 @@ export const distributeCards = (cards, setCards) => {
 
   setCards(temp);
 };
+
+const convertToJSON = (gameStats, cards) => {
+  const resp = {
+    playerScore: gameStats.playerScore,
+    aiScore: gameStats.aiScore,
+    aiWon: gameStats.aiWon,
+    playerWon: gameStats.playerWon,
+    aiAlgo: gameStats.aiALgo,
+
+    aiHand: [
+      cards.filter((card) => card.rowNumber === 0 && card.isFlipped === false),
+    ],
+  };
+};
+
+export const sendRequestToAi = async ({
+  gameStats,
+  setGameStats,
+  cards,
+  setCards,
+}) => {
+  const req = convertToJSON(gameStats, cards);
+};

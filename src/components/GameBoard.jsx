@@ -13,7 +13,6 @@ const GameBoard = () => {
     hasStarted: false,
     playerTurn: true,
     hasEnded: false,
-    AITurn: false,
     playerScore: 0,
     AIScore: 0,
     playerWon: false,
@@ -55,6 +54,7 @@ const GameBoard = () => {
   const handleDragEnd = (event) => {
     const { active, over } = event;
     if (!over) return;
+    if (!gameStats.playerTurn) return;
 
     for (let row = 1; row <= 4; row++) {
       if (over.id === `drop-row-${row}`) {
@@ -69,6 +69,13 @@ const GameBoard = () => {
     }
 
     handleDropAudioRef(dropCardAudioRef);
+
+    setGameStats((prev) => {
+      return {
+        ...prev,
+        playerTurn: false,
+      };
+    });
   };
 
   const dropCardAudioRef = useRef(null);
@@ -77,13 +84,12 @@ const GameBoard = () => {
     if (event.current) {
       event.current.currentTime = 0;
       event.current.play();
-      console.log("audio");
     }
   };
 
   return (
     <>
-      <audio ref={bgmAudioRef} src="/sound/music1.ogg" preload="auto" />
+      <audio ref={bgmAudioRef} src="/sound/music1.ogg" preload="auto" loop />
       {!gameStats.hasStarted ? (
         <GameStartBox
           handleTestAudio={handleTestAudio}
