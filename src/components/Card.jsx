@@ -25,9 +25,9 @@ const Card = ({ card }) => {
 
   const style = transform
     ? {
-      transform: CSS.Translate.toString(transform),
-      zIndex: 100, // Make sure the dragged card is on top
-    }
+        transform: CSS.Translate.toString(transform),
+        zIndex: 100, // Make sure the dragged card is on top
+      }
     : undefined; // No transform when not dragging
 
   const [isAnimating, setIsAnimating] = useState(false);
@@ -56,20 +56,22 @@ const Card = ({ card }) => {
       {...attributes}
       style={style}
     >
-      <audio ref={audioRef} prefoad="auto" className="hidden" id="CardHove">
-        <source src="/sound/thud.ogg" type="audio/ogg" />
-      </audio>
-      {!card.isFlipped ? (
-        <img
-          src={`/cards_1/${card.cardNumber}.png`}
-          className="w-full h-full object-fit"
-        />
-      ) : (
-        <img
-          src={`/cards_1/0.png`}
-          className="w-full h-full object-fit rounded-xl"
-        />
-      )}
+      <div className="w-full h-full  backdrop-blur-lg bg-white/10 border border-black border-dashed rounded-xl  p-1">
+        <audio ref={audioRef} prefoad="auto" className="hidden" id="CardHove">
+          <source src="/sound/thud.ogg" type="audio/ogg" />
+        </audio>
+        {!card.isFlipped ? (
+          <img
+            src={`/cards_1/${card.cardNumber}.png`}
+            className="w-full h-full object-fit"
+          />
+        ) : (
+          <img
+            src={`/cards_1/0.png`}
+            className="w-full h-full object-fit rounded-xl"
+          />
+        )}
+      </div>
     </div>
   );
 };
