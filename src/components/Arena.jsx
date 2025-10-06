@@ -7,8 +7,8 @@ import LoadingSpinner from "./Loading";
 const Arena = ({ cards, setCards, gameStats, setGameStats }) => {
   return (
     <>
-      <div className="col-span-12  grid grid-cols-11 h-full w-full rounded-xl  shadow-black gap-12 px-12 pb-2 mt-1 ">
-        <div className="col-span-3  bg-black/02 rounded-l-xl shadow-black/30 flex items-center justify-center">
+      <div className="col-span-11  grid grid-cols-10 h-full w-full rounded-xl  shadow-black gap-12 px-12 pb-2 mt-1 ">
+        <div className="col-span-2  bg-black/02 rounded-l-xl shadow-black/30 flex items-center justify-center">
           <DrawPile
             cards={cards}
             setCards={setCards}
@@ -24,7 +24,7 @@ const Arena = ({ cards, setCards, gameStats, setGameStats }) => {
           />
         </div>
         <div className="col-span-2 w-full h-full ">
-          <AlgoSelector />
+          <AlgoSelector gameStats={gameStats} setGameStats={setGameStats} />
         </div>
       </div>
       {!gameStats.playerTurn ? (

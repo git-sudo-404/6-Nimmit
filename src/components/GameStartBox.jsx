@@ -32,7 +32,7 @@ const GameStartBox = ({ handleTestAudio, handleStartGame }) => {
           </div>
           <div className="row-span-6 w-full h-full border border-black border-dashed rounded-xl p-1 overflow-scroll hover:scale-104 ">
             <div className="w-full h-full border border-black border-dashed rounded-xl overflow-scroll font-bold text-black p-7  max-h-150">
-              <div>
+              <div onMouseEnter={handleStartBoxAudioRef}>
                 <h2 className="text-3xl font-bold mb-4">
                   Game Rules: 6-Nimmt!
                 </h2>
