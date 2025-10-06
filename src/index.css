@@ -32,3 +32,21 @@
 .animate-fly-in {
   animation: fly-in 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
 }
+
+@keyframes deal-card {
+  from {
+    /* Start the card from a specific position off-screen, for a flying-in effect */
+    opacity: 0;
+    transform: translate(-100vw, -10vh) rotate(-720deg) scale(0.5);
+    /* transform: translate(1vw, 1vw) rotate(180deg) scale(0.5); */
+  }
+  to {
+    /* End the card at its final position on the board */
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+}
+
+.animate-deal-card {
+  animation: deal-card 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+}

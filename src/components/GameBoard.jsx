@@ -14,17 +14,25 @@ const GameBoard = () => {
     playerTurn: true,
     hasEnded: false,
     playerScore: 0,
-    AIScore: 0,
+    aiScore: 0,
     playerWon: false,
-    AIwon: false,
-    AIAlgo: 0, // by default = 0 --> ExpectiMiniMax Algo , 1 --> Monte Carlo Tree Search , 3 --> Reinforcement Learning, 4 --> NN(function approximation)
+    aiWon: false,
+    // isDealingCard: true,
+    aiAlgo: 0, // by default = 0 --> ExpectiMiniMax Algo , 1 --> Monte Carlo Tree Search .
   });
 
   const [activeId, setActiveId] = useState(null);
 
   useEffect(() => {
-    distributeCards(cards, setCards);
-  }, []);
+    if (gameStats.hasStarted)
+      // setTimeout(() => {
+      distributeCards(cards, setCards);
+    setGameStats((prev) => ({
+      ...prev,
+      // isDealingCard: false,
+    }));
+    // }, 1500);
+  }, [gameStats.hasStarted]);
 
   const bgmAudioRef = useRef(null);
 
@@ -33,7 +41,6 @@ const GameBoard = () => {
       bgmAudioRef.current.currentTime = 0;
       bgmAudioRef.current.play();
     }
-    console.log("Audio Test Played");
   };
 
   const handleStartGame = () => {

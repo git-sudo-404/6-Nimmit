@@ -44,55 +44,52 @@ export const shuffleArray = (array) => {
 
 export const distributeCards = (cards, setCards) => {
   let cardNumbers = [];
-  let temp = [];
   const n = 30;
 
-  console.log(cardNumbers);
-
   for (let i = 1; i <= n; i++) {
-    temp.push(createCard());
     cardNumbers.push(i);
   }
-
   shuffleArray(cardNumbers);
 
-  // Player's Hand
+  const initialCards = cardNumbers.map((num) =>
+    createCard({
+      cardNumber: num,
+      rowNumber: 6, // Draw Pile
+      isFlipped: true,
+      isInDrawPile: true,
+    }),
+  );
+  setCards(initialCards);
 
-  for (let i = 0; i < 10; i++) {
-    temp[i].cardNumber = cardNumbers[i];
-    temp[i].rowNumber = 5;
-    temp[i].colNumber = i;
-    temp[i].isFlipped = false;
-    temp[i].isSelect = false;
-    temp[i].isInBullHeadStack = false;
-    temp[i].isInDrawPile = false;
-  }
+  // Use a single loop with a delay to distribute cards one by one
+  let distributedCount = 0;
+  const interval = setInterval(() => {
+    if (distributedCount >= 20) {
+      clearInterval(interval);
+      return;
+    }
+    setCards((prevCards) => {
+      const newCards = [...prevCards];
+      const cardToUpdate = newCards[distributedCount];
+      if (distributedCount < 10) {
+        // Player's Hand
+        cardToUpdate.rowNumber = 5;
+        cardToUpdate.colNumber = distributedCount;
+        cardToUpdate.isFlipped = false;
+        cardToUpdate.isInDrawPile = false;
 
-  // AI's Hand
-
-  for (let i = 10; i < 20; i++) {
-    temp[i].cardNumber = cardNumbers[i];
-    temp[i].rowNumber = 0;
-    temp[i].colNumber = i - 10;
-    temp[i].isFlipped = false;
-    temp[i].isSelect = false;
-    temp[i].isInBullHeadStack = false;
-    temp[i].isInDrawPile = false;
-  }
-
-  // DrawPile
-
-  for (let i = 20; i < n; i++) {
-    temp[i].cardNumber = cardNumbers[i];
-    temp[i].rowNumber = 6;
-    temp[i].colNumber = 0;
-    temp[i].isFlipped = true;
-    temp[i].isSelect = false;
-    temp[i].isInBullHeadStack = false;
-    temp[i].isInDrawPile = true;
-  }
-
-  setCards(temp);
+        // console.log(distributedCount);
+      } else {
+        // AI's Hand
+        cardToUpdate.rowNumber = 0;
+        cardToUpdate.colNumber = distributedCount - 10;
+        cardToUpdate.isFlipped = true;
+        cardToUpdate.isInDrawPile = false;
+      }
+      return newCards;
+    });
+    distributedCount++;
+  }, 50);
 };
 
 const convertToJSON = (gameStats, cards) => {
@@ -103,10 +100,28 @@ const convertToJSON = (gameStats, cards) => {
     playerWon: gameStats.playerWon,
     aiAlgo: gameStats.aiALgo,
 
-    aiHand: [
-      cards.filter((card) => card.rowNumber === 0 && card.isFlipped === false),
-    ],
+    cards: cards,
   };
+  return resp;
+};
+
+const setNewGameState = (cards, setCards, gameStats, setGameStats, data) => {
+  let newGameStats = gameStats.copy();
+
+  newGameStats.playerScore = data.playerScore;
+  newGameStats.aiScore = data.aiScore;
+  newGameStats.aiWon = data.aiWon;
+  newGameStats.playerWon = data.playerWon;
+
+  setGameStats((prev) => ({
+    ...prev,
+    playerScore: data.playerScore,
+    aiScore: data.aiScore,
+    aiWon: data.aiWon,
+    playerWon: data.playerWon,
+  }));
+
+  setCards(data.cards);
 };
 
 export const sendRequestToAi = async ({
@@ -116,4 +131,21 @@ export const sendRequestToAi = async ({
   setCards,
 }) => {
   const req = convertToJSON(gameStats, cards);
+
+  try {
+    const response = await fetch(`${process.env.API}/gameStats.aiALgo`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(req),
+    });
+
+    const data = await response.json();
+    console.log("Success : ", data);
+
+    setNewGameState(cards, setCards, gameStats, setGameStats, data);
+  } catch (error) {
+    console.log("Error in sending req to server: ", error);
+  }
 };

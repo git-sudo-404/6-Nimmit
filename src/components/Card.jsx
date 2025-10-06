@@ -1,8 +1,9 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
+import { motion } from "framer-motion";
 
-const Card = ({ card }) => {
+const Card = ({ card, gameStats, setGameStats }) => {
   if (card.cardNumber === undefined) {
     return;
   }
@@ -25,9 +26,9 @@ const Card = ({ card }) => {
 
   const style = transform
     ? {
-        transform: CSS.Translate.toString(transform),
-        zIndex: 100, // Make sure the dragged card is on top
-      }
+      transform: CSS.Translate.toString(transform),
+      zIndex: 100, // Make sure the dragged card is on top
+    }
     : undefined; // No transform when not dragging
 
   const [isAnimating, setIsAnimating] = useState(false);
@@ -45,7 +46,22 @@ const Card = ({ card }) => {
     }
   }, [card.rowNumber]); // Rerun this effect when the rowNumber changes
 
-  const className = `w-full h-full ${isAnimating ? "animate-fly-in" : ""}`;
+  const [isDealing, setIsDealing] = useState(false);
+  useEffect(() => {
+    if (!card.isInDrawPile && (card.rowNumber === 5 || card.rowNumber === 0)) {
+      setIsDealing(true);
+
+      const timer = setTimeout(() => {
+        setIsDealing(false);
+        playsound();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [card.isInDrawPile, card.rowNumber]);
+
+  const className = `w-full h-full 
+  ${isAnimating ? "animate-fly-in" : ""} 
+  ${isDealing ? "animate-deal-card" : ""}`;
 
   return (
     <div
