@@ -80,10 +80,43 @@ def getRows(cards):
 
 #actual game logic
 
+def getBullHeads(card):
+    num = card.cardNumber 
+    if(num==55):
+        return 7 
+    if(num%10==0):
+        return 3
+    if(num%11==0):
+        return 5 
+    if(num%5==0):
+        return 2
+    return 1
+    
+
+def setCardsOfThisRowToPlayerBullstack(gameStats,cards,row):
+    for card in cards:
+        if(card.rowNumber==row):
+            card.rowNumber = 5 
+            card.isFlipped = True
+            card.isInBullHeadStack = True 
+            gameStats.playerScore += getBullHeads(card)
+            
+
+
+def setCardsOfThisRowToAiBullStack(gameStats,cards,row):
+    for card in cards:
+        if(card.cardNumber==row):
+            card.rowNumber = 0
+            card.isFlipped = True 
+            card.isInBullHeadStack = True
+            gameStats.aiScore += getBullHeads(card)
+
+
 def calc_next(cards,gameStats):
     playerHand = getPlayerCards(cards)
     aiHand = getAiCards(cards)
     rows = getRows(cards)
+    
 
     
 
