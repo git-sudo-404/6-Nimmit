@@ -36,7 +36,15 @@ const GameBoard = () => {
       // isDealingCard: false,
     }));
     // }, 1500);
+
+    cards.map((card) => {
+      if (card.rowNumber === 1) console.log(card.cardNumber);
+    });
   }, [gameStats.hasStarted]);
+
+  useEffect(() => {
+    setCards(cards);
+  }, [cards]);
 
   const bgmAudioRef = useRef(null);
 
@@ -70,13 +78,7 @@ const GameBoard = () => {
   const checkIsInValidMove = (cardNumber, rowNumber) => {
     let row = cards.filter((card) => card.rowNumber === rowNumber);
 
-    row.map((card) => {
-      if (card.cardNumber > cardNumber) {
-        return true;
-      }
-    });
-
-    return false;
+    return row.some((card) => card.cardNumber > cardNumber);
   };
 
   const handleDragEnd = async (event) => {
@@ -93,6 +95,12 @@ const GameBoard = () => {
 
         for (let i = 0; i < 104; i++) {
           if (temp[i].cardNumber === Number(active.id)) {
+            cards.map((card) => {
+              if (card.rowNumber === 4) {
+                console.log(card.cardNumber);
+              }
+            });
+            console.log("HI");
             if (checkIsInValidMove(temp[i].cardNumber, over.id)) {
               setIsInValidMove(true);
 
@@ -100,6 +108,7 @@ const GameBoard = () => {
                 setIsInValidMove(false);
                 //NOTE : Add error audio here.
               }, 1000);
+              return;
             } else {
               temp[i].rowNumber = over.id;
             }
