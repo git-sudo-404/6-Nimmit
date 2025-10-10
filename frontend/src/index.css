@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes fly-in {
+  from {
+    /* Start the card from a specific position off-screen, for a flying-in effect */
+    opacity: 0;
+    /* transform: translate(-50vw, -50vh) rotate(-360deg) scale(0.5); */
+    transform: translate(100vw) scale(0.5);
+  }
+  to {
+    /* End the card at its final position on the board */
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+}
+
+.animate-fly-in {
+  animation: fly-in 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+}
+
+@keyframes deal-card {
+  from {
+    /* Start the card from a specific position off-screen, for a flying-in effect */
+    opacity: 0;
+    transform: translate(-100vw, -10vh) rotate(-720deg) scale(0.5);
+    /* transform: translate(1vw, 1vw) rotate(180deg) scale(0.5); */
+  }
+  to {
+    /* End the card at its final position on the board */
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+}
+
+.animate-deal-card {
+  animation: deal-card 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+}

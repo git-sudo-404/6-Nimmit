@@ -1,0 +1,177 @@
+import React, { useEffect } from "react";
+import PlayerHand from "./PlayerHand";
+import EnemyHand from "./EnemyHand";
+import Arena from "./Arena";
+import { createCard, distributeCards, sendRequestToAi } from "../lib/utils.js";
+import { useState, useRef } from "react";
+import GameStartBox from "./GameStartBox.jsx";
+import { DndContext, DragOverlay } from "@dnd-kit/core";
+
+const GameBoard = () => {
+  const [cards, setCards] = useState([]);
+  const [gameStats, setGameStats] = useState({
+    hasStarted: false,
+    playerTurn: true,
+    hasEnded: false,
+    playerScore: 0,
+    aiScore: 0,
+    playerWon: false,
+    aiWon: false,
+    // isDealingCard: true,
+    aiAlgo: 0, // by default = 0 --> ExpectiMiniMax Algo , 1 --> Monte Carlo Tree Search .
+  });
+
+  const buttonRef = useRef(null);
+  const [activeId, setActiveId] = useState(null);
+
+  useEffect(() => {
+    if (gameStats.hasStarted)
+      // setTimeout(() => {
+      distributeCards(cards, setCards);
+    setGameStats((prev) => ({
+      ...prev,
+      // isDealingCard: false,
+    }));
+    // }, 1500);
+  }, [gameStats.hasStarted]);
+
+  const bgmAudioRef = useRef(null);
+
+  const handleTestAudio = () => {
+    if (bgmAudioRef.current) {
+      bgmAudioRef.current.currentTime = 0;
+      bgmAudioRef.current.play();
+    }
+  };
+
+  const handleStartGame = () => {
+    if (bgmAudioRef.current) {
+      bgmAudioRef.current.currentTime = 0;
+      bgmAudioRef.current.play();
+    }
+    if (buttonRef.current) {
+      buttonRef.current.currentTime = 0;
+      buttonRef.current.play();
+    }
+
+    setGameStats((prevGameStats) => ({
+      ...prevGameStats,
+      hasStarted: true,
+    }));
+  };
+
+  const handleDragStart = (event) => {
+    setActiveId(event.active.id);
+  };
+
+  const handleDragEnd = async (event) => {
+    const { active, over } = event;
+    if (!over) return;
+    if (!gameStats.playerTurn) return;
+
+    // console.log("ACTIVE ID : ", active.id);
+    // console.log("OVER ID : ", over.id);
+
+    for (let row = 1; row <= 4; row++) {
+      if (over.id === `${row}`) {
+        // setCards((prev) =>
+        //   prev.map((card) =>
+        //     card.cardNumber === Number(active.id) // convert string -> number
+        //       ? { ...card, rowNumber: row }
+        //       : card,
+        //   ),
+        // );
+
+        let temp = [...cards];
+
+        // console.log(typeof active.id, active.id);
+
+        for (let i = 0; i < 104; i++) {
+          // console.log(temp[i].cardNumber, active.id);
+          // console.log(typeof temp[i].cardNumber, temp[i].cardNumber);
+
+          // console.log(Number(active.id));
+          // console.log(temp[i].cardNumber);
+
+          if (temp[i].cardNumber === Number(active.id)) {
+            temp[i].rowNumber = over.id;
+          }
+        }
+
+        handleDropAudioRef(dropCardAudioRef);
+
+        setGameStats((prev) => ({
+          ...prev,
+          playerTurn: false,
+        }));
+
+        setCards(temp);
+
+        setTimeout(() => {
+          setGameStats((prev) => ({
+            ...prev,
+            playerTurn: true,
+          }));
+        }, 1000);
+
+        await sendRequestToAi(cards, setCards, gameStats, setGameStats);
+        break;
+      }
+    }
+  };
+
+  const dropCardAudioRef = useRef(null);
+
+  const handleDropAudioRef = (event) => {
+    if (event.current) {
+      event.current.currentTime = 0;
+      event.current.play();
+    }
+  };
+
+  return (
+    <>
+      <audio ref={bgmAudioRef} src="/sound/music1.ogg" preload="auto" loop />
+      {!gameStats.hasStarted ? (
+        <GameStartBox
+          handleTestAudio={handleTestAudio}
+          handleStartGame={handleStartGame}
+        />
+      ) : (
+        <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          <audio src="/sound/thud.ogg" ref={buttonRef} />
+          <audio src="/sound/slice1.ogg" ref={dropCardAudioRef} />
+          <DragOverlay></DragOverlay>
+          <div className="grid grid-rows-12 h-screen w-screen">
+            <div className="row-span-2 z-100 ">
+              <EnemyHand
+                cards={cards}
+                setCards={setCards}
+                gameStats={gameStats}
+                setGameStats={setGameStats}
+              />
+            </div>
+            <div className="row-span-8">
+              <Arena
+                cards={cards}
+                setCards={setCards}
+                gameStats={gameStats}
+                setGameStats={setGameStats}
+              />
+            </div>
+            <div className="row-span-2 ">
+              <PlayerHand
+                cards={cards}
+                setCards={setCards}
+                gameStats={gameStats}
+                setGameStats={setGameStats}
+              />
+            </div>
+          </div>
+        </DndContext>
+      )}
+    </>
+  );
+};
+
+export default GameBoard;

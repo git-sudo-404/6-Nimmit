@@ -1,9 +1,24 @@
-### ToDo List :
+## Installation and Setup :
 
-- For now use the images for the cards.
-- Later dynamically generate the card numbers using the font similar to 'omarchy'
-  or something and render the cards.
-- add music and sound effects.
+##### Prerequisite :
+
+- Have node installed.
+- Have fastAPI,pydantic installed.
+
+#### Run the below commands:
+
+-     cd frontend
+-     npm install
+-     npm run dev
+-     cd ..
+-     cd backend
+-     python -m venv venv
+
+##### _Ifwindows_
+
+-     venv\Scripts\activate
+-     pip install fastapi uvicorn pydantic
+-     uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 ### 6 - Nimmt
 
@@ -43,8 +58,3 @@
 
 - Add multiplayer Support.
 - Add AI Arena where different Algorithms compete against one another.
-
-#### To Do :
-
-- add cards distribution animation.
-- Add Tyepcheck using typescript.
