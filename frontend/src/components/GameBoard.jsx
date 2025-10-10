@@ -6,6 +6,7 @@ import { createCard, distributeCards, sendRequestToAi } from "../lib/utils.js";
 import { useState, useRef } from "react";
 import GameStartBox from "./GameStartBox.jsx";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
+import InValidMove from "./InValidMove.jsx";
 
 const GameBoard = () => {
   const [cards, setCards] = useState([]);
@@ -23,6 +24,8 @@ const GameBoard = () => {
 
   const buttonRef = useRef(null);
   const [activeId, setActiveId] = useState(null);
+
+  const [isInValidMove, setIsInValidMove] = useState(false);
 
   useEffect(() => {
     if (gameStats.hasStarted)
@@ -64,6 +67,18 @@ const GameBoard = () => {
     setActiveId(event.active.id);
   };
 
+  const checkIsInValidMove = (cardNumber, rowNumber) => {
+    let row = cards.filter((card) => card.rowNumber === rowNumber);
+
+    row.map((card) => {
+      if (card.cardNumber > cardNumber) {
+        return true;
+      }
+    });
+
+    return false;
+  };
+
   const handleDragEnd = async (event) => {
     const { active, over } = event;
     if (!over) return;
@@ -74,27 +89,20 @@ const GameBoard = () => {
 
     for (let row = 1; row <= 4; row++) {
       if (over.id === `${row}`) {
-        // setCards((prev) =>
-        //   prev.map((card) =>
-        //     card.cardNumber === Number(active.id) // convert string -> number
-        //       ? { ...card, rowNumber: row }
-        //       : card,
-        //   ),
-        // );
-
         let temp = [...cards];
 
-        // console.log(typeof active.id, active.id);
-
         for (let i = 0; i < 104; i++) {
-          // console.log(temp[i].cardNumber, active.id);
-          // console.log(typeof temp[i].cardNumber, temp[i].cardNumber);
-
-          // console.log(Number(active.id));
-          // console.log(temp[i].cardNumber);
-
           if (temp[i].cardNumber === Number(active.id)) {
-            temp[i].rowNumber = over.id;
+            if (checkIsInValidMove(temp[i].cardNumber, over.id)) {
+              setIsInValidMove(true);
+
+              setTimeout(() => {
+                setIsInValidMove(false);
+                //NOTE : Add error audio here.
+              }, 1000);
+            } else {
+              temp[i].rowNumber = over.id;
+            }
           }
         }
 
@@ -141,6 +149,7 @@ const GameBoard = () => {
         <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <audio src="/sound/thud.ogg" ref={buttonRef} />
           <audio src="/sound/slice1.ogg" ref={dropCardAudioRef} />
+          {isInValidMove ? <InValidMove /> : null}
           <DragOverlay></DragOverlay>
           <div className="grid grid-rows-12 h-screen w-screen">
             <div className="row-span-2 z-100 ">

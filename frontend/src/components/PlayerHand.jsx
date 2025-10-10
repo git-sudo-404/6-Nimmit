@@ -18,14 +18,18 @@ const PlayerHand = ({ cards, setCards, gameStats, setGameStats }) => {
 
   bullHeadStack.map((card) => (card.isFlipped = true));
 
-  console.log("PLAYER BULLSTACK : ", bullHeadStack);
+  // console.log("PLAYER BULLSTACK : ", bullHeadStack);
 
   return (
     <>
       <div className="mt-2  bg-black/01 p-1 px-1.5 grid grid-cols-12 gap-1 ml-2.5 mt-0.5 h-19/20 w-69/70 backdrop-blur-sm  justify-center items-center rounded-xl  border-black/20 border-2 shadow-lg shadow-black/30  ">
         <div className="  span-col-1 w-full h-full rounded-2xl hover:animate-pulse">
           <div className="w-85/100 h-100/100 rounded-xl  border-dashed  ">
-            {bullHeadStack[0] ? <Card card={bullHeadStack[0]} /> : null}
+            {bullHeadStack.length > 0 ? (
+              <Card card={bullHeadStack[0]} />
+            ) : (
+              <div className="w-full h-full border-2 border-black border-dashed rounded-2xl"></div>
+            )}
           </div>
         </div>
         <div className="hover:animate-bounce col-span-1 w-full h-full rounded-2xl   text-2xl font-mono flex justify-center items-center hover:bg-white/30 hover:border-red-500 hover:text-red-500 hover:text-4xl transition-all "></div>
@@ -45,7 +49,7 @@ const PlayerHand = ({ cards, setCards, gameStats, setGameStats }) => {
             ) : (
               <div
                 key={ind}
-                className="border w-full h-full border-white border-dashed rounded-xl hover:scale-125"
+                className="border w-85/100 h-98/100 border-white border-dashed rounded-xl hover:scale-125"
               ></div>
             ),
           )}

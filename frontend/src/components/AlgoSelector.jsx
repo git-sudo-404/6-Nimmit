@@ -77,8 +77,8 @@ const AlgoSelector = ({ gameStats, setGameStats }) => {
         {/* </div> */}
       </div>
       <div className="row-span-2 grid w-full h-100/100 ">
-        <div className="w-full h-50/100 grid-cols-2 gap-2 p-2 justify-center items-center flex backdrop-blur-3xl rounded-3xl px-2 py-2 gap-4">
-          <div className="col-span-1 w-full h-full bg-white/10 rounded-3xl hover:bg-white/50">
+        <div className="w-full h-60/100 grid-cols-2 gap-2 p-2 justify-center items-center flex  rounded-3xl px-2 py-2 gap-4">
+          <div className="col-span-1 w-full h-full backdrop-blur-3xl rounded-3xl hover:bg-white/50">
             <button
               className="w-full h-full flex justify-center items-center "
               onClick={handleClickSound}
@@ -87,7 +87,7 @@ const AlgoSelector = ({ gameStats, setGameStats }) => {
               <FaChevronLeft className="size-15 text-black/10 hover:text-black/80" />
             </button>
           </div>
-          <div className="col-span-1 w-full h-full bg-white/10 rounded-3xl hover:bg-white/50">
+          <div className="col-span-1 w-full h-full backdrop-blur-3xl rounded-3xl hover:bg-white/50">
             <button
               className="w-full h-full flex justify-center items-center"
               onClick={handleClickSound}
