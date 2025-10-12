@@ -55,6 +55,10 @@ const GameBoard = () => {
     }
   };
 
+  // useEffect(() => {
+  //   console.log("CARDS UPDATED : ", cards);
+  // }, [cards]);
+
   const handleStartGame = () => {
     if (bgmAudioRef.current) {
       bgmAudioRef.current.currentTime = 0;
@@ -75,8 +79,8 @@ const GameBoard = () => {
     setActiveId(event.active.id);
   };
 
-  const checkIsInValidMove = (cardNumber, rowNumber) => {
-    let row = cards.filter((card) => card.rowNumber === rowNumber);
+  const checkIsInValidMove = (cardNumber, rowNumber, temp) => {
+    console.log("Inside the check function");
 
     return row.some((card) => card.cardNumber > cardNumber);
   };
@@ -103,7 +107,7 @@ const GameBoard = () => {
             console.log("HI");
             if (checkIsInValidMove(temp[i].cardNumber, over.id)) {
               setIsInValidMove(true);
-
+              console.log("SET TO TRUE");
               setTimeout(() => {
                 setIsInValidMove(false);
                 //NOTE : Add error audio here.
@@ -131,7 +135,7 @@ const GameBoard = () => {
           }));
         }, 1000);
 
-        await sendRequestToAi(cards, setCards, gameStats, setGameStats);
+        await sendRequestToAi(temp, setCards, gameStats, setGameStats);
         break;
       }
     }
@@ -148,6 +152,7 @@ const GameBoard = () => {
 
   return (
     <>
+      {isInValidMove ? <InValidMove /> : null}
       <audio ref={bgmAudioRef} src="/sound/music1.ogg" preload="auto" loop />
       {!gameStats.hasStarted ? (
         <GameStartBox
@@ -158,7 +163,6 @@ const GameBoard = () => {
         <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <audio src="/sound/thud.ogg" ref={buttonRef} />
           <audio src="/sound/slice1.ogg" ref={dropCardAudioRef} />
-          {isInValidMove ? <InValidMove /> : null}
           <DragOverlay></DragOverlay>
           <div className="grid grid-rows-12 h-screen w-screen">
             <div className="row-span-2 z-100 ">

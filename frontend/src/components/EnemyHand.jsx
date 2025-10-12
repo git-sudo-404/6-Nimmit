@@ -10,7 +10,9 @@ const EnemyHand = ({ cards, setCards, gameStats, setGameStats }) => {
 
   playerCards.map((card) => (card.isFlipped = true));
 
-  let bullHeadStack = playerCards.filter((card) => card.rowNumber === 0);
+  let bullHeadStack = playerCards.filter(
+    (card) => card.rowNumber === 0 && card.isInBullHeadStack === true,
+  );
 
   let enemycards = playerCards.filter(
     (card) => card.rowNumber === 0 && !card.isInBullHeadStack,
