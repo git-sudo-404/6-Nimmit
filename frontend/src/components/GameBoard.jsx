@@ -7,6 +7,7 @@ import { useState, useRef } from "react";
 import GameStartBox from "./GameStartBox.jsx";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import InValidMove from "./InValidMove.jsx";
+import MoveRowToBullHead from "./MoveRowToBullHead.jsx";
 
 const GameBoard = () => {
   const [cards, setCards] = useState([]);
@@ -26,6 +27,7 @@ const GameBoard = () => {
   const [activeId, setActiveId] = useState(null);
 
   const [isInValidMove, setIsInValidMove] = useState(false);
+  const [isRowMovedToBullHead, setIsRowMovedToBullHead] = useState(false);
 
   useEffect(() => {
     if (gameStats.hasStarted)
@@ -72,13 +74,22 @@ const GameBoard = () => {
   };
 
   const checkIsInValidMove = (cardNumber, rowNumber, temp) => {
-    console.log("Inside the check function");
-
     let row = temp.filter((card) => card.rowNumber === Number(rowNumber));
-
-    console.log("row : ", row, "\ncard : ", cardNumber);
-
     return row.some((card) => card.cardNumber > cardNumber);
+  };
+
+  const checkAllRowsLessThanPlayerCard = (cardNumber, temp) => {
+    let row1 = temp.filter((card) => card.rowNumber === 1);
+    let row2 = temp.filter((card) => card.rowNumber === 2);
+    let row3 = temp.filter((card) => card.rowNumber === 3);
+    let row4 = temp.filter((card) => card.rowNumber === 4);
+
+    if (row1.some((card) => card.cardNumber < cardNumber)) return false;
+    if (row2.some((card) => card.cardNumber < cardNumber)) return false;
+    if (row3.some((card) => card.cardNumber < cardNumber)) return false;
+    if (row4.some((card) => card.cardNumber < cardNumber)) return false;
+
+    return true;
   };
 
   const handleDragEnd = async (event) => {
@@ -95,13 +106,31 @@ const GameBoard = () => {
 
         for (let i = 0; i < 104; i++) {
           if (temp[i].cardNumber === Number(active.id)) {
-            if (checkIsInValidMove(temp[i].cardNumber, over.id, temp)) {
+            let playerMaxi = 0;
+            temp.map((card) => {
+              if (card.rowNumber === 5)
+                playerMaxi = Math.max(playerMaxi, card.cardNumber);
+            });
+            if (checkAllRowsLessThanPlayerCard(playerMaxi, temp)) {
+              temp = temp.map((card) => {
+                if (card.rowNumber === Number(over.id)) {
+                  card.rowNumber = 5;
+                  card.isInBullHeadStack = true;
+                  card.isFlipped = true;
+                  return card;
+                } else return card;
+              });
+              temp[i].rowNumber = Number(over.id);
+              setIsRowMovedToBullHead(true);
+              setTimeout(() => {
+                setIsRowMovedToBullHead(false);
+              }, 1500);
+            } else if (checkIsInValidMove(temp[i].cardNumber, over.id, temp)) {
               setIsInValidMove(true);
-              console.log("SET TO TRUE");
               setTimeout(() => {
                 setIsInValidMove(false);
                 //NOTE : Add error audio here.
-              }, 1000);
+              }, 1500);
             } else {
               temp[i].rowNumber = over.id;
             }
@@ -142,6 +171,7 @@ const GameBoard = () => {
   return (
     <>
       {isInValidMove ? <InValidMove /> : null}
+      {isRowMovedToBullHead ? <MoveRowToBullHead /> : null}
       <audio ref={bgmAudioRef} src="/sound/music1.ogg" preload="auto" loop />
       {!gameStats.hasStarted ? (
         <GameStartBox
