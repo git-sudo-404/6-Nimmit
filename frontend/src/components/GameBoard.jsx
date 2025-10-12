@@ -38,7 +38,15 @@ const GameBoard = () => {
       // isDealingCard: false,
     }));
     // }, 1500);
+
+    cards.map((card) => {
+      if (card.rowNumber === 1) console.log(card.cardNumber);
+    });
   }, [gameStats.hasStarted]);
+
+  useEffect(() => {
+    setCards(cards);
+  }, [cards]);
 
   const bgmAudioRef = useRef(null);
 
@@ -74,22 +82,9 @@ const GameBoard = () => {
   };
 
   const checkIsInValidMove = (cardNumber, rowNumber, temp) => {
-    let row = temp.filter((card) => card.rowNumber === Number(rowNumber));
+    console.log("Inside the check function");
+
     return row.some((card) => card.cardNumber > cardNumber);
-  };
-
-  const checkAllRowsLessThanPlayerCard = (cardNumber, temp) => {
-    let row1 = temp.filter((card) => card.rowNumber === 1);
-    let row2 = temp.filter((card) => card.rowNumber === 2);
-    let row3 = temp.filter((card) => card.rowNumber === 3);
-    let row4 = temp.filter((card) => card.rowNumber === 4);
-
-    if (row1.some((card) => card.cardNumber < cardNumber)) return false;
-    if (row2.some((card) => card.cardNumber < cardNumber)) return false;
-    if (row3.some((card) => card.cardNumber < cardNumber)) return false;
-    if (row4.some((card) => card.cardNumber < cardNumber)) return false;
-
-    return true;
   };
 
   const handleDragEnd = async (event) => {
@@ -106,31 +101,19 @@ const GameBoard = () => {
 
         for (let i = 0; i < 104; i++) {
           if (temp[i].cardNumber === Number(active.id)) {
-            let playerMaxi = 0;
-            temp.map((card) => {
-              if (card.rowNumber === 5)
-                playerMaxi = Math.max(playerMaxi, card.cardNumber);
+            cards.map((card) => {
+              if (card.rowNumber === 4) {
+                console.log(card.cardNumber);
+              }
             });
-            if (checkAllRowsLessThanPlayerCard(playerMaxi, temp)) {
-              temp = temp.map((card) => {
-                if (card.rowNumber === Number(over.id)) {
-                  card.rowNumber = 5;
-                  card.isInBullHeadStack = true;
-                  card.isFlipped = true;
-                  return card;
-                } else return card;
-              });
-              temp[i].rowNumber = Number(over.id);
-              setIsRowMovedToBullHead(true);
-              setTimeout(() => {
-                setIsRowMovedToBullHead(false);
-              }, 1500);
-            } else if (checkIsInValidMove(temp[i].cardNumber, over.id, temp)) {
+            console.log("HI");
+            if (checkIsInValidMove(temp[i].cardNumber, over.id)) {
               setIsInValidMove(true);
               setTimeout(() => {
                 setIsInValidMove(false);
                 //NOTE : Add error audio here.
-              }, 1500);
+              }, 1000);
+              return;
             } else {
               temp[i].rowNumber = over.id;
             }
