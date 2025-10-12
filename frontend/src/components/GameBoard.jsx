@@ -36,7 +36,15 @@ const GameBoard = () => {
       // isDealingCard: false,
     }));
     // }, 1500);
+
+    cards.map((card) => {
+      if (card.rowNumber === 1) console.log(card.cardNumber);
+    });
   }, [gameStats.hasStarted]);
+
+  useEffect(() => {
+    setCards(cards);
+  }, [cards]);
 
   const bgmAudioRef = useRef(null);
 
@@ -74,10 +82,6 @@ const GameBoard = () => {
   const checkIsInValidMove = (cardNumber, rowNumber, temp) => {
     console.log("Inside the check function");
 
-    let row = temp.filter((card) => card.rowNumber === Number(rowNumber));
-
-    console.log("row : ", row, "\ncard : ", cardNumber);
-
     return row.some((card) => card.cardNumber > cardNumber);
   };
 
@@ -95,13 +99,20 @@ const GameBoard = () => {
 
         for (let i = 0; i < 104; i++) {
           if (temp[i].cardNumber === Number(active.id)) {
-            if (checkIsInValidMove(temp[i].cardNumber, over.id, temp)) {
+            cards.map((card) => {
+              if (card.rowNumber === 4) {
+                console.log(card.cardNumber);
+              }
+            });
+            console.log("HI");
+            if (checkIsInValidMove(temp[i].cardNumber, over.id)) {
               setIsInValidMove(true);
               console.log("SET TO TRUE");
               setTimeout(() => {
                 setIsInValidMove(false);
                 //NOTE : Add error audio here.
               }, 1000);
+              return;
             } else {
               temp[i].rowNumber = over.id;
             }
