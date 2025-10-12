@@ -1,9 +1,19 @@
 import React from "react";
-const Scores = ({ playerScore, aiScore, lcolor, rcolor, round }) => {
+const Scores = ({
+  playerScore,
+  aiScore,
+  lcolor,
+  rcolor,
+  round,
+  handleHoverSound,
+}) => {
   return (
     <>
       <div className="w-full h-20/100 rounded-xl">
-        <div className="w-full h-full rounded-xl bg-black/10  grid grid-rows-3 ">
+        <div
+          className="w-full h-full rounded-xl bg-black/10  grid grid-rows-3 hover:scale-110 transition-all duration-75 "
+          onMouseEnter={() => handleHoverSound()}
+        >
           <div className=" row-span-1 w-full h-full doto-font flex justify-center items-center">
             <p>Round {round}</p>
           </div>

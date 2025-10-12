@@ -26,7 +26,7 @@ const EnemyHand = ({ cards, setCards, gameStats, setGameStats }) => {
             {bullHeadStack.length > 0 ? (
               <Card card={bullHeadStack[0]} />
             ) : (
-              <div className="border border-dashed border-2 w-full h-full rounded-2xl"></div>
+              <div className="border-2 border-dashed border-black w-full h-full rounded-2xl"></div>
             )}
           </div>
         </div>
