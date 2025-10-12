@@ -1,8 +1,10 @@
+import { useEffect } from "react";
+
 export const INITIAL_CARD_STATE = {
   cardNumber: 0,
   isFlipped: true,
   isSelect: false,
-  rowNumber: 5, // only 5 rows (0-4), a row of index 5 indicates the card is still in the stack
+  rowNumber: 6, // only 5 rows (0-4), a row of index 5 indicates the card is still in the stack
   colNumber: 0,
   isInBullHeadStack: false,
   isInDrawPile: true,
@@ -13,7 +15,7 @@ export const createCard = (
     cardNumber = 0,
     isFlipped = false,
     isSelect = false,
-    rowNumber = 5,
+    rowNumber = 6,
     colNumber = 0,
     isInBullHeadStack = false,
     isInDrawPile = true,
@@ -43,60 +45,69 @@ export const shuffleArray = (array) => {
 };
 
 export const distributeCards = (cards, setCards) => {
-  let cardNumbers = [];
-  const n = 104;
+  let cardNums = [];
+  for (let i = 1; i <= 104; i++) cardNums.push(i);
 
-  for (let i = 1; i <= n; i++) {
-    cardNumbers.push(i);
-  }
-  shuffleArray(cardNumbers);
+  shuffleArray(cardNums);
 
-  const initialCards = cardNumbers.map((num) =>
+  const initialDeck = cardNums.map((cardNum) =>
     createCard({
-      cardNumber: num,
-      rowNumber: 6, // Draw Pile
+      cardNumber: cardNum,
       isFlipped: true,
+      isInBullHeadStack: false,
+      isSelect: false,
       isInDrawPile: true,
     }),
   );
-  setCards(initialCards);
 
-  // Use a single loop with a delay to distribute cards one by one
-  let distributedCount = 0;
-  let rowN = 1;
-  const interval = setInterval(() => {
-    if (distributedCount >= 23) {
-      clearInterval(interval);
-      return;
+  setCards(initialDeck);
+
+  console.log(cards);
+
+  shuffleArray(cardNums);
+
+  let rowNum = 1;
+
+  let distributeIdx = 0;
+
+  const setIntervalID = setInterval(() => {
+    if (distributeIdx === 104) {
+      clearInterval(setIntervalID);
     }
-    setCards((prevCards) => {
-      const newCards = [...prevCards];
-      const cardToUpdate = newCards[distributedCount];
-      if (distributedCount < 10) {
-        // Player's Hand
-        cardToUpdate.rowNumber = 5;
-        cardToUpdate.colNumber = distributedCount;
-        cardToUpdate.isFlipped = false;
-        cardToUpdate.isInDrawPile = false;
 
-        // console.log(distributedCount);
-      } else if (distributedCount >= 10 && distributedCount < 20) {
-        // AI's Hand
-        cardToUpdate.rowNumber = 0;
-        cardToUpdate.colNumber = distributedCount - 10;
-        cardToUpdate.isFlipped = true;
-        cardToUpdate.isInDrawPile = false;
-      } else {
-        cardToUpdate.rowNumber = rowN;
-        cardToUpdate.colNumber = 0;
-        cardToUpdate.isFlipped = false;
-        cardToUpdate.isInDrawPile = false;
-        // console.log(rowN);
-      }
+    setCards((cards) => {
+      const newCards = cards.map((card, idx) => {
+        // console.log(distributeIdx);
+        if (idx === distributeIdx) {
+          if (distributeIdx < 10) {
+            card.rowNumber = 0;
+            card.isFlipped = false;
+            card.isInDrawPile = false;
+            return card;
+          } else if (distributeIdx >= 10 && distributeIdx < 20) {
+            card.rowNumber = 5;
+            card.isFlipped = false;
+            card.isInDrawPile = false;
+            return card;
+          } else if (distributeIdx >= 20 && distributeIdx <= 23) {
+            card.rowNumber = rowNum;
+            card.isFlipped = false;
+            card.isInDrawPile = false;
+            return card;
+          } else {
+            card.isFlipped = true;
+            card.rowNumber = 6;
+            card.isInDrawPile = true;
+            return card;
+          }
+        } else {
+          return card;
+        }
+      });
       return newCards;
     });
-    if (distributedCount >= 20) rowN++;
-    distributedCount++;
+    if (distributeIdx >= 20) rowNum++;
+    distributeIdx++;
   }, 50);
 };
 
