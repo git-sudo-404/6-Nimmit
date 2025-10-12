@@ -25,19 +25,19 @@ const GameStartBox = ({ handleTestAudio, handleStartGame }) => {
                 ref={startBoxAudioRef}
                 className="hidden"
               />
-              <div className="row-span-1 font-bold  transform-all duration-100 text-3xl w-full h-full border border-dashed border-black rounded-xl flex justify-center items-center text-black textfont-bold">
+              <div className=" pixel-font row-span-1 font-bold  transform-all duration-100 text-3xl w-full h-full border border-dashed border-black rounded-xl flex justify-center items-center text-black textfont-bold">
                 <h1>Welcome to 6-Nimmt!</h1>
               </div>
             </div>
           </div>
-          <div className="row-span-6 w-full h-full border border-black border-dashed rounded-xl p-1 overflow-scroll hover:scale-104 font-blackOpsOne">
-            <div className="w-full h-full border border-black border-dashed rounded-xl overflow-scroll font-bold text-black p-7  max-h-150 font-blackOpsOne">
+          <div className="doto-font font-bold press-start-2p-regular row-span-6 w-full h-full border border-black border-dashed rounded-xl p-1 overflow-scroll hover:scale-104 font-blackOpsOne">
+            <div className="w-full h-full border border-black border-dashed rounded-xl overflow-scroll font-bold text-white p-7  max-h-150 font-blackOpsOne">
               <div
                 onMouseEnter={handleStartBoxAudioRef}
                 className="font-blackOpsOne"
               >
-                <h2 className="text-3xl font-bold mb-4">
-                  Game Rules: 6-Nimmt!
+                <h2 className="text-3xl text-black font-bold mb-4 pixel-font pl-50">
+                  Game Rules
                 </h2>
                 <p className="text-lg mb-4">
                   The goal is to be the player with the{" "}
@@ -46,7 +46,7 @@ const GameStartBox = ({ handleTestAudio, handleStartGame }) => {
                   The game ends when a player reaches 66 points.
                 </p>
 
-                <h3 className="text-2xl font-semibold mt-6 mb-2">Setup</h3>
+                <h3 className="text-2xl  mt-6 mb-2">Setup</h3>
                 <ul className="list-disc list-inside space-y-2 mb-4">
                   <li className="font-blackOpsOne">
                     The game is for 2-10 players.
@@ -183,8 +183,9 @@ const GameStartBox = ({ handleTestAudio, handleStartGame }) => {
             <div className="flex justify-center items-center">
               <div className="">
                 <button
-                  className=" relative mt-2 text-xl italic font-bold border animate-bounce hover:animate-none border-dashed text-black border-black rounded-xl p-3 shadow-xl shadow-black/40 hover:scale-125 transform-all duration-100 font-blackOpsOne "
+                  className="doto-font text-white relative mt-2 text-xl italic font-bold border animate-bounce hover:animate-none border-dashed text-black border-black rounded-xl p-3 shadow-xl shadow-black/40 hover:scale-125 transform-all duration-100 font-blackOpsOne "
                   onClick={handleStartGame}
+                  onMouseEnter={handleStartBoxAudioRef}
                 >
                   Start Game
                 </button>

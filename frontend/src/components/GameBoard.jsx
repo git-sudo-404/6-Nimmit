@@ -15,12 +15,24 @@ const GameBoard = () => {
     hasStarted: false,
     playerTurn: true,
     hasEnded: false,
-    playerScore: 0,
-    aiScore: 0,
     playerWon: false,
     aiWon: false,
     // isDealingCard: true,
     aiAlgo: 0, // by default = 0 --> ExpectiMiniMax Algo , 1 --> Monte Carlo Tree Search .
+    playerScore: 0,
+    aiScore: 0,
+    r1Over: false,
+    r2Over: false,
+    r3Over: false,
+    r1playerWon: false,
+    r2playerWon: false,
+    r3playerWon: false,
+    r1playerScore: 0,
+    r2playerScore: 0,
+    r3playerScore: 0,
+    r1aiScore: 0,
+    r2aiScore: 0,
+    r3aiScore: 0,
   });
 
   const buttonRef = useRef(null);
@@ -79,10 +91,18 @@ const GameBoard = () => {
   };
 
   const checkAllRowsLessThanPlayerCard = (cardNumber, temp) => {
-    let row1 = temp.filter((card) => card.rowNumber === 1);
-    let row2 = temp.filter((card) => card.rowNumber === 2);
-    let row3 = temp.filter((card) => card.rowNumber === 3);
-    let row4 = temp.filter((card) => card.rowNumber === 4);
+    let row1 = temp.filter(
+      (card) => card.rowNumber === 1 && !card.isInBullHeadStack,
+    );
+    let row2 = temp.filter(
+      (card) => card.rowNumber === 2 && !card.isInBullHeadStack,
+    );
+    let row3 = temp.filter(
+      (card) => card.rowNumber === 3 && !card.isInBullHeadStack,
+    );
+    let row4 = temp.filter(
+      (card) => card.rowNumber === 4 && !card.isInBullHeadStack,
+    );
 
     if (row1.some((card) => card.cardNumber < cardNumber)) return false;
     if (row2.some((card) => card.cardNumber < cardNumber)) return false;
@@ -124,7 +144,7 @@ const GameBoard = () => {
               setIsRowMovedToBullHead(true);
               setTimeout(() => {
                 setIsRowMovedToBullHead(false);
-              }, 1500);
+              }, 2500);
             } else if (checkIsInValidMove(temp[i].cardNumber, over.id, temp)) {
               setIsInValidMove(true);
               setTimeout(() => {

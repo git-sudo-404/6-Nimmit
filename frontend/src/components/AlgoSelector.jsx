@@ -37,7 +37,7 @@ const AlgoSelector = ({ gameStats, setGameStats }) => {
         className="hidden"
         type="audio/ogg"
       />
-      <div className="row-span-3 grid grid-rows-5 gap-2 p-4 w-full h-full font-mono backdrop-blur-3xl rounded-3xl">
+      <div className="row-span-3 grid grid-rows-5 gap-2 p-4 w-full h-full doto-font  backdrop-blur-3xl rounded-3xl">
         <div className="row-span-1 border border-black border-dashed w-full h-full rounded-xl flex justify-center items-center bg-black/70  hover:bg-black hover:border-white hover:text-xl transition-all">
           Algorithm
         </div>

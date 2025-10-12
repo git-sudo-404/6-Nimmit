@@ -50,3 +50,16 @@
 .animate-deal-card {
   animation: deal-card 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
 }
+.doto-font {
+  font-family: "Doto", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 900;
+  font-style: bold;
+  font-variation-settings: "ROND" 20;
+}
+
+.pixel-font {
+  font-family: "Press Start 2P", system-ui;
+  font-weight: 400;
+  font-style: normal;
+}

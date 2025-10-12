@@ -18,7 +18,7 @@ function App() {
     <>
       <BackGround />
       {/* <RenderCard key={cards[0].cardNumber} card={cards[0]} /> */}
-      <GameBoard />
+      <GameBoard className="doto-font" />
     </>
   );
 }
