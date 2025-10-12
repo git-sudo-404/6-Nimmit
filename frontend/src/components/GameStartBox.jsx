@@ -14,7 +14,7 @@ const GameStartBox = ({ handleTestAudio, handleStartGame }) => {
   return (
     <div className="h-150 w-200 absolute top-40 left-80 backdrop-blur-2xl rounded-3xl z-[1000]">
       <div className="border p-2  border-black border-dashed rounded-2xl w-full h-full bg-black/10 font-blackOpsOne">
-        <div className=" p-5 border grid grid-rows-8 gap-4 border-black border-dashed rounded-2xl w-full h-full bg-white/10  justify-center items-center font-blackOpsOne">
+        <div className=" p-5 border grid grid-rows-8 gap-4 border-black border-dashed rounded-2xl w-full h-full   justify-center items-center font-blackOpsOne">
           <div className="h-full w-full gap-4  row-span-2 font-blackOpsOne ">
             <div
               className="h-full w-full border-black border rounded-xl border-dashed p-1 hover:scale-105 transform-all duration-150"

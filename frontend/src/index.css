@@ -55,11 +55,17 @@
   font-optical-sizing: auto;
   font-weight: 900;
   font-style: bold;
-  font-variation-settings: "ROND" 20;
+  font-variation-settings: "ROND" 100;
 }
 
 .pixel-font {
   font-family: "Press Start 2P", system-ui;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.score-font {
+  font-family: "Jersey 10", sans-serif;
   font-weight: 400;
   font-style: normal;
 }
