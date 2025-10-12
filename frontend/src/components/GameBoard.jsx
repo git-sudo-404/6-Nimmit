@@ -7,6 +7,7 @@ import { useState, useRef } from "react";
 import GameStartBox from "./GameStartBox.jsx";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import InValidMove from "./InValidMove.jsx";
+import MoveRowToBullHead from "./MoveRowToBullHead.jsx";
 
 const GameBoard = () => {
   const [cards, setCards] = useState([]);
@@ -26,6 +27,7 @@ const GameBoard = () => {
   const [activeId, setActiveId] = useState(null);
 
   const [isInValidMove, setIsInValidMove] = useState(false);
+  const [isRowMovedToBullHead, setIsRowMovedToBullHead] = useState(false);
 
   useEffect(() => {
     if (gameStats.hasStarted)
@@ -107,7 +109,6 @@ const GameBoard = () => {
             console.log("HI");
             if (checkIsInValidMove(temp[i].cardNumber, over.id)) {
               setIsInValidMove(true);
-              console.log("SET TO TRUE");
               setTimeout(() => {
                 setIsInValidMove(false);
                 //NOTE : Add error audio here.
@@ -153,6 +154,7 @@ const GameBoard = () => {
   return (
     <>
       {isInValidMove ? <InValidMove /> : null}
+      {isRowMovedToBullHead ? <MoveRowToBullHead /> : null}
       <audio ref={bgmAudioRef} src="/sound/music1.ogg" preload="auto" loop />
       {!gameStats.hasStarted ? (
         <GameStartBox
