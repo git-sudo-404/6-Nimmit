@@ -123,6 +123,18 @@ const convertToJSON = (gameStats, cards) => {
     aiWon: gameStats.aiWon,
     aiAlgo: gameStats.aiAlgo,
     cards: cards,
+    r1Over: gameStats.r1Over,
+    r2Over: gameStats.r2Over,
+    r3Over: gameStats.r3Over,
+    r1playerWon: gameStats.r1playerWon,
+    r2playerWon: gameStats.r2playerWon,
+    r3playerWon: gameStats.r3playerWon,
+    r1playerScore: gameStats.r1playerScore,
+    r2playerScore: gameStats.r2playerScore,
+    r3playerScore: gameStats.r3playerScore,
+    r1aiScore: gameStats.r1aiScore,
+    r2aiScore: gameStats.r2aiScore,
+    r3aiScore: gameStats.r3aiScore,
   };
   return resp;
 };
@@ -167,11 +179,10 @@ export const sendRequestToAi = async (
     });
 
     const data = await response.json();
-    console.log("Success : ", data);
+    console.log("Data from Backend : ", data);
 
     setNewGameState(cards, setCards, gameStats, setGameStats, data);
   } catch (error) {
     console.log("Error in sending req to server: ", error);
   }
-  console.log("HI FROM API");
 };

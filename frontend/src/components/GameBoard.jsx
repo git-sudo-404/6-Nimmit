@@ -90,26 +90,71 @@ const GameBoard = () => {
     return row.some((card) => card.cardNumber > cardNumber);
   };
 
-  const checkAllRowsLessThanPlayerCard = (cardNumber, temp) => {
-    let row1 = temp.filter(
-      (card) => card.rowNumber === 1 && !card.isInBullHeadStack,
-    );
-    let row2 = temp.filter(
-      (card) => card.rowNumber === 2 && !card.isInBullHeadStack,
-    );
-    let row3 = temp.filter(
-      (card) => card.rowNumber === 3 && !card.isInBullHeadStack,
-    );
-    let row4 = temp.filter(
-      (card) => card.rowNumber === 4 && !card.isInBullHeadStack,
-    );
+  const checkAllRowsGreaterThanPlayerCard = (cardNumber, temp) => {
+    let row1 = temp.filter((card) => card.rowNumber === 1);
+    let row2 = temp.filter((card) => card.rowNumber === 2);
+    let row3 = temp.filter((card) => card.rowNumber === 3);
+    let row4 = temp.filter((card) => card.rowNumber === 4);
 
-    if (row1.some((card) => card.cardNumber < cardNumber)) return false;
-    if (row2.some((card) => card.cardNumber < cardNumber)) return false;
-    if (row3.some((card) => card.cardNumber < cardNumber)) return false;
-    if (row4.some((card) => card.cardNumber < cardNumber)) return false;
+    let res = true;
 
-    return true;
+    if (row1.some((card) => card.cardNumber > cardNumber)) {
+    } else {
+      res = false;
+    }
+    if (row2.some((card) => card.cardNumber > cardNumber)) {
+    } else {
+      res = false;
+    }
+
+    if (row3.some((card) => card.cardNumber > cardNumber)) {
+    } else {
+      res = false;
+    }
+
+    if (row4.some((card) => card.cardNumber > cardNumber)) {
+    } else {
+      res = false;
+    }
+
+    console.log("CARD NUMBER : ", cardNumber);
+    console.log(row1);
+    console.log(row2);
+    console.log(row3);
+    console.log(row4);
+    return res;
+  };
+
+  const handleFullRow = (temp, rowNumber) => {
+    cnosole.log("INSIDE handle 6 card full row function");
+    temp = temp.map((card) => {
+      if (card.rowNumber === rowNumber) {
+        card.rowNumber = 0;
+        card.isInBullHeadStack = true;
+        return card;
+      } else return card;
+    });
+  };
+
+  const checkAndHandleFullRow = (temp) => {
+    let r1 = temp.filter((card) => card.rowNumber === 1);
+    let r2 = temp.filter((card) => card.rowNumber === 2);
+    let r3 = temp.filter((card) => card.rowNumber === 3);
+    let r4 = temp.filter((card) => card.rowNumber === 4);
+
+    if (r1.length >= 6) handleFullRow(temp, 1);
+    if (r2.length >= 6) handleFullRow(temp, 2);
+    if (r3.length >= 6) handleFullRow(temp, 3);
+    if (r4.length >= 6) handleFullRow(temp, 4);
+
+    console.log(r1);
+    console.log(r2);
+    console.log(r3);
+    console.log(r4);
+
+    console.log("INSIDE check 6 cards function");
+
+    return;
   };
 
   const handleDragEnd = async (event) => {
@@ -128,10 +173,13 @@ const GameBoard = () => {
           if (temp[i].cardNumber === Number(active.id)) {
             let playerMaxi = 0;
             temp.map((card) => {
-              if (card.rowNumber === 5)
+              if (card.rowNumber === 5 && !card.isInBullHeadStack)
                 playerMaxi = Math.max(playerMaxi, card.cardNumber);
             });
-            if (checkAllRowsLessThanPlayerCard(playerMaxi, temp)) {
+            // console.log("PLAYER MAXI : ", playerMaxi);
+            if (checkAllRowsGreaterThanPlayerCard(playerMaxi, temp)) {
+              // console.log("INSIDE THE IF BLOCK");
+              setIsRowMovedToBullHead(true);
               temp = temp.map((card) => {
                 if (card.rowNumber === Number(over.id)) {
                   card.rowNumber = 5;
@@ -141,37 +189,42 @@ const GameBoard = () => {
                 } else return card;
               });
               temp[i].rowNumber = Number(over.id);
-              setIsRowMovedToBullHead(true);
               setTimeout(() => {
                 setIsRowMovedToBullHead(false);
               }, 2500);
             } else if (checkIsInValidMove(temp[i].cardNumber, over.id, temp)) {
+              // console.log("INSIDE THE WRONG IF BLOCK");
               setIsInValidMove(true);
               setTimeout(() => {
                 setIsInValidMove(false);
                 //NOTE : Add error audio here.
               }, 1500);
-            } else {
               temp[i].rowNumber = over.id;
+              setCards(temp);
             }
           }
         }
 
         handleDropAudioRef(dropCardAudioRef);
 
+        // assume if a row is full then the player is the one who made the last move , since the ai's full row cards is handled in the backend.
+        checkAndHandleFullRow(temp);
+
+        setCards(temp);
+
         setGameStats((prev) => ({
           ...prev,
           playerTurn: false,
         }));
-
-        setCards(temp);
 
         setTimeout(() => {
           setGameStats((prev) => ({
             ...prev,
             playerTurn: true,
           }));
-        }, 1000);
+        }, 1500);
+
+        console.log("SENDING REQ TO AI");
 
         await sendRequestToAi(temp, setCards, gameStats, setGameStats);
         break;

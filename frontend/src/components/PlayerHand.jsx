@@ -41,7 +41,7 @@ const PlayerHand = ({ cards, setCards, gameStats, setGameStats }) => {
                 className="col-span-1 w-85/100 h-99/100 hover:scale-150 "
               >
                 <Card
-                  card={playerCards[ind]}
+                  card={playerHandCards[ind]}
                   gameStats={gameStats}
                   setGameStats={setGameStats}
                 />

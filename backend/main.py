@@ -45,6 +45,19 @@ class State(BaseModel):
     aiWon : bool 
     aiAlgo : int 
     cards : List[Card]
+    r1Over: bool
+    r2Over: bool
+    r3Over: bool
+    r1playerWon: bool
+    r2playerWon: bool
+    r3playerWon: bool
+    r1playerScore: int
+    r2playerScore: int 
+    r3playerScore: int 
+    r1aiScore: int 
+    r2aiScore: int 
+    r3aiScore: int
+
 
 #get functions 
 
@@ -61,23 +74,21 @@ def getGameStats(state: State):
         "aiScore": state.aiScore,
         "playerWon": state.playerWon,
         "aiWon": state.aiWon,
-        "aiAlgo": state.aiAlgo
+        "aiAlgo": state.aiAlgo,
+        "r1Over" : state.r1Over,    
+        "r2Over" : state.r2Over,
+        "r3Over" : state.r3Over,
+        "r1playerWon" : state.r1playerWon,
+        "r2playerWon" : state.r2playerWon,
+        "r3playerWon" : state.r3playerWon,
+        "r1playerScore" : state.r1playerScore,
+        "r2playerScore" : state.r2playerScore,
+        "r3playerScore" : state.r3playerScore,
+        "r1aiScore" : state.r1aiScore,
+        "r2aiScore" : state.r2aiScore,
+        "r3aiScore" : state.r3aiScore
     }
 
-
-
-# def getGameStats(state:State):
-#     gameStats = {
-#         hasStarted:state.hasStarted,
-#         playerTurn:state.playerTurn,
-#         hasEnded:state.playerTurn,
-#         playerScore:state.playerScore,
-#         aiScore:state.aiScore,
-#         playerWon:state.playerWon,
-#         aiWon:state.aiWon,
-#         aiAlgo:state.aiAlgo
-#     }
-#     return gameStats
 
 
 def getPlayerCards(cards):
@@ -121,7 +132,7 @@ def setCardsOfThisRowToPlayerBullstack(gameStats,cards,row):
 
 def setCardsOfThisRowToAiBullStack(gameStats,cards,row):
     for card in cards:
-        if(card.cardNumber==row):
+        if(card.rowNumber==row):
             card.rowNumber = 0
             card.isFlipped = True 
             card.isInBullHeadStack = True
@@ -129,99 +140,54 @@ def setCardsOfThisRowToAiBullStack(gameStats,cards,row):
 
 
             
-def get_last_card_of_row(cards, row_number):
-    """Return the card with the largest cardNumber in a given row."""
-    row_cards = [c for c in cards if c.rowNumber == row_number and not c.isInBullHeadStack]
-    if not row_cards:
-        return None
-    return max(row_cards, key=lambda c: c.cardNumber)
+def getCardInRow(cards,rowNumber):
+    row = [_ for _ in cards if _.rowNumber==rowNumber]
+    return row 
 
-def count_cards_in_row(cards, row_number):
-    """Return number of cards currently in a row."""
-    return len([c for c in cards if c.rowNumber == row_number and not c.isInBullHeadStack])
+def aiCardTooLow(cards):
+    row1 = getCardInRow(cards,1)
+    row2 = getCardInRow(cards,2)
+    row3 = getCardInRow(cards,3)
+    row4 = getCardInRow(cards,4)
+    
+    m1 = max(card.cardNumber for card in row1)
+    m2 = max(card.cardNumber for card in row2)
+    m3 = max(card.cardNumber for card in row3)
+    m4 = max(card.cardNumber for card in row4)
 
+    maxPlayerCard = max(card.cardNumber for card in cards if card.rowNumber==0 and not card.isInBullHeadStack)
+    
+    if(maxPlayerCard<min(m1,m2,m3,m4)):
+        return True 
 
+    return False
 
-def makeAiMove(cards, gameStats):
-    aiHand = getAiCards(cards)
-    rows = getRows(cards)
+def getBullHeadScoreOfRow(cards,rowNumber):
+    row = getCardInRow(cards,rowNumber)
+    rowBullHeadScore = sum(getBullHeads(card) for card in row)
+    return rowBullHeadScore
+    
 
-    if not aiHand:
-        return  # no cards to play
+def handleFullRow(cards,gameStats):
+    # choose the minimum  cardNumber from ai hand when the full row is taken into bullheadstack 
+    minimumCardNumber = min(card.cardNumber for card in cards if card.rowNumber==0 and not card.isInBullHeadStack)
+    rowScores = [1,2,3,4]
+    rowScores.sort(key=lambda row:getBullHeadScoreOfRow(cards,row))
+    for card in cards : 
+        if card.rowNumber == rowScores[0]:
+            card.rowNumber = 0
+            card.isInBullHeadStack = True 
+            gameStats["aiScore"] += getBullHeads(card)
+        if card.cardNumber == minimumCardNumber:
+            card.rowNumber = rowScores[0]
+            
+            
+def convertToJSON(gameStats,cards):
+     # Convert card objects to dicts (Pydantic will handle it too, but let's ensure it’s pure JSON)
+    cards_json = [card.dict() for card in cards]
 
-    best_card = None
-    best_row = None
-    min_penalty = float('inf')
-
-    for card in aiHand:
-        chosen_row = None
-        closest_diff = float('inf')
-
-        # Step 1 — find row whose last card < this card and is closest
-        for i, row in enumerate(rows, start=1):
-            last_card = get_last_card_of_row(cards, i)
-            if not last_card:
-                continue
-            if last_card.cardNumber < card.cardNumber:
-                diff = card.cardNumber - last_card.cardNumber
-                if diff < closest_diff:
-                    closest_diff = diff
-                    chosen_row = i
-
-        # Step 2 — if no valid row, choose one with least bullheads (must take it)
-        if not chosen_row:
-            min_bullheads = float('inf')
-            for i, row in enumerate(rows, start=1):
-                bull_sum = sum(getBullHeads(c) for c in row if not c.isInBullHeadStack)
-                if bull_sum < min_bullheads:
-                    min_bullheads = bull_sum
-                    chosen_row = i
-            penalty = min_bullheads
-        else:
-            penalty = 0  # safe placement
-
-        # Step 3 — pick card with minimal penalty
-        if penalty < min_penalty:
-            min_penalty = penalty
-            best_card = card
-            best_row = chosen_row
-
-    if not best_card or not best_row:
-        return
-
-    # --- Step 4: Place AI card ---
-    # If AI must take a row (no valid placement)
-    last_card = get_last_card_of_row(cards, best_row)
-    if last_card and best_card.cardNumber < last_card.cardNumber:
-        # collect all cards in that row
-        for c in cards:
-            if c.rowNumber == best_row and not c.isInBullHeadStack:
-                gameStats["aiScore"] += getBullHeads(c)
-                c.rowNumber = 0
-                c.isFlipped = True
-                c.isInBullHeadStack = True
-
-    # now place the AI card in that row
-    best_card.rowNumber = best_row
-    best_card.isFlipped = True
-    best_card.isSelect = False
-    best_card.isInDrawPile = False
-    best_card.isInBullHeadStack = False
-
-    # --- Step 5: Check if row overflowed (6 cards) ---
-    if count_cards_in_row(cards, best_row) >= 6:
-        for c in cards:
-            if c.rowNumber == best_row and not c.isInBullHeadStack:
-                gameStats["aiScore"] += getBullHeads(c)
-                c.rowNumber = 0
-                c.isFlipped = True
-                c.isInBullHeadStack = True
-
-
-
-def convertToJSON(gameStats, cards):
-
-    return {
+    # Construct the full state as per your State model
+    state_json = {
         "hasStarted": gameStats["hasStarted"],
         "playerTurn": gameStats["playerTurn"],
         "hasEnded": gameStats["hasEnded"],
@@ -230,57 +196,92 @@ def convertToJSON(gameStats, cards):
         "playerWon": gameStats["playerWon"],
         "aiWon": gameStats["aiWon"],
         "aiAlgo": gameStats["aiAlgo"],
-        "cards": [
-            c.model_dump() if hasattr(c, "model_dump") else vars(c)
-            for c in cards
-        ],
+        "r1Over": gameStats["r1Over"],
+        "r2Over": gameStats["r2Over"],
+        "r3Over": gameStats["r3Over"],
+        "r1playerWon": gameStats["r1playerWon"],
+        "r2playerWon": gameStats["r2playerWon"],
+        "r3playerWon": gameStats["r3playerWon"],
+        "r1playerScore": gameStats["r1playerScore"],
+        "r2playerScore": gameStats["r2playerScore"],
+        "r3playerScore": gameStats["r3playerScore"],
+        "r1aiScore": gameStats["r1aiScore"],
+        "r2aiScore": gameStats["r2aiScore"],
+        "r3aiScore": gameStats["r3aiScore"],
+        "cards": cards_json
     }
 
-def calc_next(cards,gameStats):
-    playerHand = getPlayerCards(cards)
-    aiHand = getAiCards(cards)
-    rows = getRows(cards)
-    
-    for i in range(4):
-        if(len(rows[i])==6):
-            for card in rows[i]:
-                gameStats["playerScore"] += getBullHeads(card)
-                card.rowNumber = 5
-                card.isInBullHeadStack = True
-                card.isFlipped = True 
+    # # Convert dict → State (so FastAPI automatically validates and serializes)
+    # return State(**state_json)
+    return state_json
 
-    makeAiMove(cards, gameStats)
+def calc_next(state):
+    cards = getCards(state)
+    gameStats = getGameStats(state)
+    if(aiCardTooLow(cards)):
+        handleFullRow(cards,gameStats)
+    else:
+        # find the smallest card that can be placed in a row 
+        ai_cards = [x for x in cards if x.rowNumber==0 and not x.isInBullHeadStack]
+        
+        ai_cards.sort(key = lambda card:card.cardNumber)
+        
+        r1 = [card for card in cards if card.rowNumber==1]
+        r2 = [card for card in cards if card.rowNumber==2]
+        r3 = [card for card in cards if card.rowNumber==3]
+        r4 = [card for card in cards if card.rowNumber==4]
+        
+        m1 = max(card.cardNumber for card in r1 )
+        m2 = max(card.cardNumber for card in r2 )
+        m3 = max(card.cardNumber for card in r3 )
+        m4 = max(card.cardNumber for card in r4 )
 
-    # Step 3: check for AI overflow
-    for i in range(1, 5):
-        if count_cards_in_row(cards, i) >= 6:
-            for card in cards:
-                if card.rowNumber == i and not card.isInBullHeadStack:
-                    gameStats["aiScore"] += getBullHeads(card)
+        minirow = -1
+        maxis = [m1,m2,m3,m4]
+
+        maxis.sort()
+
+        if(maxis[0]==m1):
+            minirow = 1 
+        elif(maxis[0]==m2):
+            minirow = 2 
+        elif(maxis[0]==m3):
+            minirow = 3 
+        else:
+            minirow = 4 
+
+        for aic in ai_cards:
+            if(aic.cardNumber>maxis[0]):
+                for card in cards :
+                    if card.cardNumber==aic.cardNumber:
+                        card.rowNumber = minirow
+                        break 
+                break
+
+        # check for if the placed card is the sixth card 
+
+        cardCount = 0
+        for card in cards : 
+            if(card.rowNumber==minirow):
+                cardCount+=1 
+
+        if(cardCount==6):
+            for card in cards : 
+                if card.rowNumber == minirow:
                     card.rowNumber = 0
-                    card.isFlipped = True
-                    card.isInBullHeadStack = True
+                    card.isInBullHeadStack = True 
+                    gameStats["aiScore"] += getBullHeads(card)
 
-
+    new_state = convertToJSON(gameStats,cards) 
     
-                    
-                
-
-    
+    return new_state
 
 @app.post('/')
 async def process_request(state:State):
     
     # duplicate = state.model_copy(update={"playerTurn": True})
-    
-    cards = getCards(state)
-    gameStats = getGameStats(state)
 
-    calc_next(cards,gameStats)
+    new_state = calc_next(state)
 
-    gameStats["playerTurn"] = True
-
-    next_state = convertToJSON(gameStats,cards)
-
-    return next_state
+    return new_state 
 
