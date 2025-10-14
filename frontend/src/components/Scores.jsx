@@ -7,6 +7,7 @@ const Scores = ({
   round,
   handleHoverSound,
 }) => {
+  // console.log("playerScore : ", playerScore);
   return (
     <>
       <div className="w-full h-20/100 rounded-xl">

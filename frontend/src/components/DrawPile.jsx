@@ -12,6 +12,8 @@ const DrawPile = ({ cards, setCards, gameStats, setGameStats }) => {
     }
   };
 
+  console.log(gameStats);
+
   return (
     <>
       <audio
@@ -50,12 +52,12 @@ const DrawPile = ({ cards, setCards, gameStats, setGameStats }) => {
             className="hover:scale-110 transition-all duration-50 col-span-1 bg-black/40 rounded-2xl w-full h-full flex justify-center items-center hover:bg-black"
             onMouseEnter={() => handleHoverSound()}
           >
-            <p className="font-bold pixel-font text-5xl">
+            <p className="font-bold pixel-font text-4xl">
               {gameStats.playerScore}
             </p>
           </div>
           <div
-            className="hover:scale-110 transition-all duration-50 col-span-1 bg-white/40 hover:bg-white pixel-font text-5xl text-black flex justify-center items-center rounded-2xl w-full h-full "
+            className="hover:scale-110 transition-all duration-50 col-span-1 bg-white/40 hover:bg-white pixel-font text-4xl text-black flex justify-center items-center rounded-2xl w-full h-full "
             onMouseEnter={() => handleHoverSound()}
           >
             <p>{gameStats.aiScore}</p>

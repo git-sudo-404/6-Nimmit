@@ -135,6 +135,7 @@ const convertToJSON = (gameStats, cards) => {
     r1aiScore: gameStats.r1aiScore,
     r2aiScore: gameStats.r2aiScore,
     r3aiScore: gameStats.r3aiScore,
+    round: gameStats.round,
   };
   return resp;
 };
@@ -185,4 +186,12 @@ export const sendRequestToAi = async (
   } catch (error) {
     console.log("Error in sending req to server: ", error);
   }
+};
+
+export const getBullHead = (cardNumber) => {
+  if (cardNumber === 55) return 7;
+  else if (cardNumber % 10 === 0) return 3;
+  else if (cardNumber % 11 === 0) return 5;
+  else if (cardNumber % 5 === 0) return 2;
+  return 1;
 };

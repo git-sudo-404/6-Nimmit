@@ -2,12 +2,19 @@ import React, { useEffect } from "react";
 import PlayerHand from "./PlayerHand";
 import EnemyHand from "./EnemyHand";
 import Arena from "./Arena";
-import { createCard, distributeCards, sendRequestToAi } from "../lib/utils.js";
+import {
+  createCard,
+  distributeCards,
+  sendRequestToAi,
+  getBullHead,
+} from "../lib/utils.js";
 import { useState, useRef } from "react";
 import GameStartBox from "./GameStartBox.jsx";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import InValidMove from "./InValidMove.jsx";
 import MoveRowToBullHead from "./MoveRowToBullHead.jsx";
+import Victory from "./Victory.jsx";
+import RoundOver from "./RoundOver.jsx";
 
 const GameBoard = () => {
   const [cards, setCards] = useState([]);
@@ -33,6 +40,7 @@ const GameBoard = () => {
     r1aiScore: 0,
     r2aiScore: 0,
     r3aiScore: 0,
+    round: 1,
   });
 
   const buttonRef = useRef(null);
@@ -117,20 +125,28 @@ const GameBoard = () => {
       res = false;
     }
 
-    console.log("CARD NUMBER : ", cardNumber);
-    console.log(row1);
-    console.log(row2);
-    console.log(row3);
-    console.log(row4);
+    // console.log("CARD NUMBER : ", cardNumber);
+    // console.log(row1);
+    // console.log(row2);
+    // console.log(row3);
+    // console.log(row4);
     return res;
   };
 
   const handleFullRow = (temp, rowNumber) => {
-    cnosole.log("INSIDE handle 6 card full row function");
+    // cnosole.log("INSIDE handle 6 card full row function");
     temp = temp.map((card) => {
       if (card.rowNumber === rowNumber) {
         card.rowNumber = 0;
         card.isInBullHeadStack = true;
+        let tempGameStats = gameStats;
+        tempGameStats.playerScore += getBullHead(card.cardNumber);
+        if (tempGameStats.round === 1)
+          tempGameStats.r1playerScore += getBullHead(card.cardNumber);
+        else if (tempGameStats.round === 2)
+          tempGameStats.r2playerScore += getBullHead(card.cardNumber);
+        else tempGameStats.r3playerScore += getBullHead(card.cardNumber);
+        setGameStats(tempGameStats);
         return card;
       } else return card;
     });
@@ -157,6 +173,35 @@ const GameBoard = () => {
     return;
   };
 
+  const updateScore = (cardNumber) => {
+    let tempGameStats = gameStats;
+    tempGameStats.playerScore += getBullHead(cardNumber);
+    if (tempGameStats.round === 1)
+      tempGameStats.r1playerScore += getBullHead(cardNumber);
+    else if (tempGameStats.round === 2)
+      tempGameStats.r2playerScore += getBullHead(cardNumber);
+    else tempGameStats.r3playerScore += getBullHead(cardNumber);
+    setGameStats(tempGameStats);
+  };
+
+  const checkRowFull = (temp, rowNumber) => {
+    let cnt = 0;
+    temp.map((card) => (card.rowNumber === rowNumber ? cnt++ : {}));
+    if (cnt >= 5) return true;
+  };
+
+  const handleRowFilledByPlayer = (temp, rowNumber) => {
+    temp = temp.map((card) => {
+      if (card.rowNumber === rowNumber) {
+        card.rowNumber = 5;
+        card.isInBullHeadStack = true;
+        updateScore(card.cardNumber);
+        return card;
+      } else return card;
+    });
+    console.log(temp);
+  };
+
   const handleDragEnd = async (event) => {
     const { active, over } = event;
     if (!over) return;
@@ -176,15 +221,25 @@ const GameBoard = () => {
               if (card.rowNumber === 5 && !card.isInBullHeadStack)
                 playerMaxi = Math.max(playerMaxi, card.cardNumber);
             });
-            // console.log("PLAYER MAXI : ", playerMaxi);
+            console.log("PLAYER MAXI : ", playerMaxi);
             if (checkAllRowsGreaterThanPlayerCard(playerMaxi, temp)) {
-              // console.log("INSIDE THE IF BLOCK");
+              console.log("INSIDE THE IF BLOCK");
               setIsRowMovedToBullHead(true);
               temp = temp.map((card) => {
                 if (card.rowNumber === Number(over.id)) {
                   card.rowNumber = 5;
                   card.isInBullHeadStack = true;
                   card.isFlipped = true;
+                  let tempGameStats = gameStats;
+                  tempGameStats.playerScore += getBullHead(card.cardNumber);
+                  if (tempGameStats.round === 1)
+                    tempGameStats.r1playerScore += getBullHead(card.cardNumber);
+                  else if (tempGameStats.round === 2)
+                    tempGameStats.r2playerScore += getBullHead(card.cardNumber);
+                  else
+                    tempGameStats.r3playerScore += getBullHead(card.cardNumber);
+                  setGameStats(tempGameStats);
+                  console.log("ROUND  : ", gameStats.round);
                   return card;
                 } else return card;
               });
@@ -193,14 +248,18 @@ const GameBoard = () => {
                 setIsRowMovedToBullHead(false);
               }, 2500);
             } else if (checkIsInValidMove(temp[i].cardNumber, over.id, temp)) {
-              // console.log("INSIDE THE WRONG IF BLOCK");
+              console.log("INSIDE THE WRONG IF BLOCK");
               setIsInValidMove(true);
               setTimeout(() => {
                 setIsInValidMove(false);
                 //NOTE : Add error audio here.
               }, 1500);
-              temp[i].rowNumber = over.id;
-              setCards(temp);
+              return;
+            } else if (checkRowFull(temp, Number(over.id))) {
+              console.log("ROW FULL!");
+              handleRowFilledByPlayer(temp, Number(over.id));
+            } else {
+              temp[i].rowNumber = Number(over.id);
             }
           }
         }
@@ -241,10 +300,20 @@ const GameBoard = () => {
     }
   };
 
+  const [isRoundOver, setIsRoundOver] = useState(false);
+  let win = false;
+
   return (
     <>
       {isInValidMove ? <InValidMove /> : null}
       {isRowMovedToBullHead ? <MoveRowToBullHead /> : null}
+      {isRoundOver ? (
+        <RoundOver
+          win={win}
+          isRoundOver={isRoundOver}
+          setIsRoundOver={setIsRoundOver}
+        />
+      ) : null}
       <audio ref={bgmAudioRef} src="/sound/music1.ogg" preload="auto" loop />
       {!gameStats.hasStarted ? (
         <GameStartBox
