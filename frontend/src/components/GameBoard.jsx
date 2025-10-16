@@ -7,6 +7,7 @@ import {
   distributeCards,
   sendRequestToAi,
   getBullHead,
+  redistributeCards,
 } from "../lib/utils.js";
 import { useState, useRef } from "react";
 import GameStartBox from "./GameStartBox.jsx";
@@ -162,13 +163,12 @@ const GameBoard = () => {
     if (r2.length >= 6) handleFullRow(temp, 2);
     if (r3.length >= 6) handleFullRow(temp, 3);
     if (r4.length >= 6) handleFullRow(temp, 4);
-
-    console.log(r1);
-    console.log(r2);
-    console.log(r3);
-    console.log(r4);
-
-    console.log("INSIDE check 6 cards function");
+    // console.log(r1);
+    // console.log(r2);
+    // console.log(r3);
+    // console.log(r4);
+    //
+    // console.log("INSIDE check 6 cards function");
 
     return;
   };
@@ -202,6 +202,37 @@ const GameBoard = () => {
     console.log(temp);
   };
 
+  const redistributionPossible = (cards) => {
+    let remainingCards = 0;
+    cards.map((card) => {
+      if (card.rowNumber === 6) remainingCards++;
+    });
+    console.log("INSIDE REDISTRIBUTION CHECK");
+    console.log(remainingCards);
+    return remainingCards >= 20;
+  };
+
+  const handleRedistribution = () => {
+    let playerRemainingCards = 0;
+    cards.map((card) => {
+      if (card.rowNumber === 5 && !card.isInBullHeadStack)
+        playerRemainingCards++;
+    });
+
+    if (playerRemainingCards === 0) {
+      let tempStats = gameStats;
+      tempStats.round++;
+      setGameStats(tempStats);
+      // distributeCards(cards, setCards);
+      if (redistributionPossible(cards)) {
+        console.log("yes redistributionPossible");
+        redistributeCards(cards, setCards);
+      } else {
+        // MoveToNextRound();
+      }
+    }
+  };
+
   const handleDragEnd = async (event) => {
     const { active, over } = event;
     if (!over) return;
@@ -221,7 +252,10 @@ const GameBoard = () => {
               if (card.rowNumber === 5 && !card.isInBullHeadStack)
                 playerMaxi = Math.max(playerMaxi, card.cardNumber);
             });
+
             console.log("PLAYER MAXI : ", playerMaxi);
+
+            // check all the rows are greater than player cards.
             if (checkAllRowsGreaterThanPlayerCard(playerMaxi, temp)) {
               console.log("INSIDE THE IF BLOCK");
               setIsRowMovedToBullHead(true);
@@ -247,7 +281,10 @@ const GameBoard = () => {
               setTimeout(() => {
                 setIsRowMovedToBullHead(false);
               }, 2500);
-            } else if (checkIsInValidMove(temp[i].cardNumber, over.id, temp)) {
+            }
+
+            // check is invalid move
+            else if (checkIsInValidMove(temp[i].cardNumber, over.id, temp)) {
               console.log("INSIDE THE WRONG IF BLOCK");
               setIsInValidMove(true);
               setTimeout(() => {
@@ -255,10 +292,19 @@ const GameBoard = () => {
                 //NOTE : Add error audio here.
               }, 1500);
               return;
-            } else if (checkRowFull(temp, Number(over.id))) {
+            }
+
+            // check row is filled by player
+            else if (checkRowFull(temp, Number(over.id))) {
               console.log("ROW FULL!");
+
               handleRowFilledByPlayer(temp, Number(over.id));
-            } else {
+              temp[i].rowNumber = 5;
+              temp[i].isInBullHeadStack = true;
+            }
+
+            //normal move
+            else {
               temp[i].rowNumber = Number(over.id);
             }
           }
@@ -271,21 +317,28 @@ const GameBoard = () => {
 
         setCards(temp);
 
-        setGameStats((prev) => ({
-          ...prev,
-          playerTurn: false,
-        }));
+        setTimeout(() => {
+          setGameStats((prev) => ({
+            ...prev,
+            playerTurn: false,
+          }));
+        }, 500);
 
         setTimeout(() => {
           setGameStats((prev) => ({
             ...prev,
             playerTurn: true,
           }));
+
+          return;
         }, 1500);
+
+        await sendRequestToAi(temp, setCards, gameStats, setGameStats);
 
         console.log("SENDING REQ TO AI");
 
-        await sendRequestToAi(temp, setCards, gameStats, setGameStats);
+        await handleRedistribution();
+
         break;
       }
     }

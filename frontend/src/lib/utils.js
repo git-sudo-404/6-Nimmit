@@ -53,6 +53,7 @@ export const distributeCards = (cards, setCards) => {
   const initialDeck = cardNums.map((cardNum) =>
     createCard({
       cardNumber: cardNum,
+      rowNumber: 6,
       isFlipped: true,
       isInBullHeadStack: false,
       isSelect: false,
@@ -182,7 +183,9 @@ export const sendRequestToAi = async (
     const data = await response.json();
     console.log("Data from Backend : ", data);
 
-    setNewGameState(cards, setCards, gameStats, setGameStats, data);
+    setTimeout(() => {
+      setNewGameState(cards, setCards, gameStats, setGameStats, data);
+    }, 1000);
   } catch (error) {
     console.log("Error in sending req to server: ", error);
   }
@@ -194,4 +197,41 @@ export const getBullHead = (cardNumber) => {
   else if (cardNumber % 11 === 0) return 5;
   else if (cardNumber % 5 === 0) return 2;
   return 1;
+};
+
+export const redistributeCards = (cards, setCards) => {
+  let remainingCards = [];
+  cards.map((card) => {
+    if (card.rowNumber === 6) remainingCards.push(card.cardNumber);
+  });
+
+  shuffleArray(remainingCards);
+
+  // set the firt 10 remainingCards to ai Hand .
+
+  let temp = cards;
+  for (let i = 0; i < 10; i++) {
+    temp = temp.map((card) => {
+      if (card.cardNumber === remainingCards[i]) {
+        card.rowNumber = 0;
+        card.isInBullHeadStack = false;
+        card.isInDrawPile = false;
+      }
+      return card;
+    });
+  }
+
+  for (let i = 10; i < 20; i++) {
+    temp = temp.map((card) => {
+      if (card.cardNumber === remainingCards[i]) {
+        card.rowNumber = 5;
+        card.isFlipped = false;
+        card.isInBullHeadStack = false;
+        card.isInDrawPile = false;
+      }
+      return card;
+    });
+  }
+
+  setCards(temp);
 };
