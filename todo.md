@@ -15,3 +15,7 @@
 * Scores for the ai is not getting updated.
 
 - animation are not smooth , the correct order : playerCard moves to a row -> ai thinking spinner -> ai makes move.
+
+## To Work on Next :
+
+- Rewrite the the delay logic everyting in asynchronous way.(Currently using SetTimeout which is not reliable).
