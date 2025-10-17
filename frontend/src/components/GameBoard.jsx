@@ -212,7 +212,7 @@ const GameBoard = () => {
     return remainingCards >= 20;
   };
 
-  const handleRedistribution = () => {
+  const handleRedistribution = async () => {
     let playerRemainingCards = 0;
     cards.map((card) => {
       if (card.rowNumber === 5 && !card.isInBullHeadStack)
@@ -232,6 +232,9 @@ const GameBoard = () => {
       }
     }
   };
+
+  const delay = (ms) =>
+    new Promise((resolve) => setTimeout(() => resolve(), ms));
 
   const handleDragEnd = async (event) => {
     const { active, over } = event;
@@ -280,7 +283,7 @@ const GameBoard = () => {
               temp[i].rowNumber = Number(over.id);
               setTimeout(() => {
                 setIsRowMovedToBullHead(false);
-              }, 2500);
+              }, 1500);
             }
 
             // check is invalid move
@@ -301,6 +304,7 @@ const GameBoard = () => {
               handleRowFilledByPlayer(temp, Number(over.id));
               temp[i].rowNumber = 5;
               temp[i].isInBullHeadStack = true;
+              await delay(1000);
             }
 
             //normal move
@@ -333,11 +337,45 @@ const GameBoard = () => {
           return;
         }, 1500);
 
-        await sendRequestToAi(temp, setCards, gameStats, setGameStats);
+        // setTimeout(() => {
+        //   sendRequestToAi(temp, setCards, gameStats, setGameStats).then(() => {
+        //     delay(1000);
+        //     console.log("THEN BLOCK");
+        //     handleRedistribution();
+        //   });
+        // }, 1500);
+        // console.log("SENDING REQ TO AI");
 
-        console.log("SENDING REQ TO AI");
+        // await delay(1500);
 
-        await handleRedistribution();
+        // const sendReqToAIPromise = new Promise((resolve, reject) => {
+        //   delay(1500).then(() => {
+        //     sendRequestToAi(temp, setCards, gameStats, setGameStats)
+        //       .then(() => {
+        //         resolve();
+        //       })
+        //       .catch(reject);
+        //   });
+        // })
+        //   .then(() => {
+        //     delay(2500).then(() => {
+        //       console.log("THEN BLOCK");
+        //       handleRedistribution();
+        //     });
+        //   })
+        //   .catch((err) => {
+        //     console.log("Error in sending req to AI: ", err);
+        //   });
+        //
+        // await sendReqToAIPromise;
+
+        setTimeout(() => {
+          sendRequestToAi(temp, setCards, gameStats, setGameStats);
+        }, 1500);
+
+        setTimeout(() => {
+          handleRedistribution();
+        }, 2500);
 
         break;
       }

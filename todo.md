@@ -8,8 +8,10 @@
 
 ### Bugs :
 
-- AI not making a move when full rows are there.
-- scores of all the rounds for the player are getting updated simultaneously.
-- Scores for the ai is not getting updated.
+- The last card placed before redistribution is not visible until after redistribution
 
-* animation are not smooth , the correct order : playerCard moves to a row -> ai thinking spinner -> ai makes move.
+* AI not making a move when full rows are there.
+* scores of all the rounds for the player are getting updated simultaneously.
+* Scores for the ai is not getting updated.
+
+- animation are not smooth , the correct order : playerCard moves to a row -> ai thinking spinner -> ai makes move.

@@ -157,9 +157,7 @@ const setNewGameState = (cards, setCards, gameStats, setGameStats, data) => {
     playerWon: data.playerWon,
   }));
 
-  setTimeout(() => {
-    setCards(data.cards);
-  }, 1000);
+  setCards(data.cards);
 };
 
 export const sendRequestToAi = async (
@@ -183,9 +181,7 @@ export const sendRequestToAi = async (
     const data = await response.json();
     console.log("Data from Backend : ", data);
 
-    setTimeout(() => {
-      setNewGameState(cards, setCards, gameStats, setGameStats, data);
-    }, 1000);
+    setNewGameState(cards, setCards, gameStats, setGameStats, data);
   } catch (error) {
     console.log("Error in sending req to server: ", error);
   }
