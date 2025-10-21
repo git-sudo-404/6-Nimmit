@@ -32,16 +32,16 @@ const DrawPile = ({ cards, setCards, gameStats, setGameStats }) => {
           handleHoverSound={handleHoverSound}
         />
         <Scores
-          playerScore={gameStats.r1playerScore}
-          aiScore={gameStats.r1aiScore}
+          playerScore={gameStats.r2playerScore}
+          aiScore={gameStats.r2aiScore}
           lcolor={1}
           rcolor={0}
           round={2}
           handleHoverSound={handleHoverSound}
         />
         <Scores
-          playerScore={gameStats.r1playerScore}
-          aiScore={gameStats.r1aiScore}
+          playerScore={gameStats.r3playerScore}
+          aiScore={gameStats.r3aiScore}
           lcolor={0}
           rcolor={1}
           round={3}

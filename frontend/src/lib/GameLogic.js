@@ -382,6 +382,7 @@ export const handleRedistribution = async (
   setCards,
   gameStats,
   setGameStats,
+  setIsRedistributing,
 ) => {
   // Just going with absolut brute force her since , its just 104 cards .
 
@@ -396,6 +397,8 @@ export const handleRedistribution = async (
   shuffleArray(remainingCards);
 
   await delay(1000);
+
+  setIsRedistributing(true);
 
   // set the first 10 to AI & the next 10 to player like in distribution .
 
@@ -434,6 +437,9 @@ export const handleRedistribution = async (
       });
     }
   }
+
+  await delay(800);
+  setIsRedistributing(false);
 };
 
 export const checkNextRound = (cards) => {
@@ -464,7 +470,7 @@ export const handleNextRound = async (
   // set the isRoundOver
 
   if (gameStats.round === 1) {
-    if (gameStats.r1playerScore > gameStats.r1aiScore) {
+    if (gameStats.r1playerScore < gameStats.r1aiScore) {
       setIsRoundWin(true);
     } else {
       setIsRoundWin(false);
@@ -484,7 +490,7 @@ export const handleNextRound = async (
 
     distributeCards(cards, setCards);
   } else if (gameStats.round === 2) {
-    if (gameStats.r2playerScore > gameStats.r2aiScore) {
+    if (gameStats.r2playerScore < gameStats.r2aiScore) {
       setIsRoundWin(true);
     } else {
       setIsRoundWin(false);

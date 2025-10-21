@@ -27,6 +27,7 @@ import {
   handleNextRound,
 } from "../lib/GameLogic.js";
 import { delay } from "../lib/utils.js";
+import RedistributingCards from "./RedistributingCards.jsx";
 
 const GameBoard = () => {
   const [cards, setCards] = useState([]);
@@ -65,6 +66,7 @@ const GameBoard = () => {
 
   const [isRoundOver, setIsRoundOver] = useState(false);
   const [isRoundWin, setIsRoundWin] = useState(false);
+  const [isRedistributing, setIsRedistributing] = useState(false);
 
   const gameStatsRef = useRef(gameStats);
   const cardsRef = useRef(cards);
@@ -218,6 +220,7 @@ const GameBoard = () => {
             setCards,
             gameStats,
             setGameStats,
+            setIsRedistributing,
           );
         }
 
@@ -252,6 +255,7 @@ const GameBoard = () => {
       {isInValidMove ? <InValidMove /> : null}
       {isRowMovedToBullHead ? <MoveRowToBullHead /> : null}
       {isSixthCardMovedToBullHead ? <SixthCardMovedToBullHead /> : null}
+      {isRedistributing ? <RedistributingCards /> : null}
       {isRoundOver ? (
         <RoundOver
           win={isRoundWin}
