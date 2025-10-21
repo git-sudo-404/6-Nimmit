@@ -10,6 +10,7 @@ import {
   delay,
   convertToJSON,
   setNewGameState,
+  getBullHead,
 } from "./utils.js";
 
 // Called after every round.
@@ -273,8 +274,14 @@ export const handlePayerMaxiLessThanRows = async (
   ChosenRow,
   isRowMovedToBullHead,
   setIsRowMovedToBullHead,
+  gameStats,
+  setGameStats,
 ) => {
   let temp = cards;
+
+  //NOTE: Update has to be called first, since the update function makes use of the cards in the row before they are sent to bullhead .
+
+  await updatePlayerScoreByRowAlone(gameStats, setGameStats, cards, ChosenRow);
 
   temp = temp.map((card) => {
     if (card.cardNumber === ChosenCard) {
@@ -352,7 +359,17 @@ export const handlePlayerPlacedSixthCard = async (
   ChosenCard,
   isSixthCardMovedToBullHead,
   setIsSixthCardMovedToBullHead,
+  gameStats,
+  setGameStats,
 ) => {
+  await updatePlayerScoreByRowAndChosenCard(
+    gameStats,
+    setGameStats,
+    cards,
+    ChosenRow,
+    ChosenCard,
+  );
+
   let temp = cards;
 
   temp = temp.map((card) => {
@@ -389,3 +406,189 @@ export const displayAIThinkingAnimation = async (gameStats, setGameStats) => {
     };
   });
 };
+
+// export const updatePlayerScoreByRowAndChosenCard = (
+//   gameStats,
+//   setGameStats,
+//   cards,
+//   ChosenRow,
+//   ChosenCard,
+// ) => {
+//   return new Promise((resolve, reject) => {
+//     let scoreIncrease = 0;
+//
+//     cards.map((card) => {
+//       if (card.rowNumber === ChosenRow || card.cardNumber === ChosenCard) {
+//         scoreIncrease += getBullHead(card.cardNumber);
+//       }
+//     });
+//
+//     let score = 0;
+//
+//     const IntervalId = setInterval(() => {
+//       if (score >= scoreIncrease) {
+//         clearInterval(IntervalId);
+//         resolve();
+//         return;
+//       }
+//
+//       setGameStats((prev) => {
+//         let newGameStats = { ...prev };
+//
+//         if (prev.round === 1) {
+//           newGameStats.r1playerScore += 1;
+//         } else if (prev.round === 2) {
+//           newGameStats.r2playerScore += 1;
+//         } else if (prev.round === 3) {
+//           newGameStats.r3playerScore += 1;
+//         }
+//
+//         newGameStats.playerScore += 1;
+//
+//         return newGameStats;
+//       });
+//       score++;
+//     }, 20);
+//   });
+// };
+//
+// export const updatePlayerScoreByRowAlone = (
+//   gameStats,
+//   setGameStats,
+//   cards,
+//   ChosenRow,
+// ) => {
+//   return new Promise((resolve, reject) => {
+//     let scoreIncrease = 0;
+//
+//     cards.map((card) => {
+//       if (card.rowNumber === ChosenRow) {
+//         scoreIncrease += getBullHead(card.cardNumber);
+//       }
+//     });
+//
+//     let score = 0;
+//
+//     //NOTE: This causes Staleness / Does stale updates.
+//     //      --> Here the gameStats might not be having the newest update.
+//     //      --> so use functinoal update in set().
+//
+//     // const IntervalId = setInterval(() => {
+//     //   if (score >= scoreIncrease) {
+//     //     clearInterval(IntervalId);
+//     //   }
+//     //
+//     //   let newGameStats = { ...gameStats };
+//     //
+//     //   newGameStats.playerScore += 1;
+//     //
+//     //   if (gameStats.round === 1) {
+//     //     newGameStats.r1playerScore += 1;
+//     //   } else if (gameStats.round === 2) {
+//     //     newGameStats.r2playerScore += 1;
+//     //   } else if (gameStats.round === 3) {
+//     //     newGameStats.r3playerScore += 1;
+//     //   }
+//     //
+//     //   score++;
+//     //
+//     //   setGameStats(newGameStats);
+//     //   console.log(gameStats.playerScore);
+//     // }, 20);
+//     // resolve();
+//
+//
+//     //NOTE: The below code also doesn't work since :
+//     //    --> The setInterval and setGameStats() are not synchronised.
+//     //    --> Js takes care of setInterval and react takes care of setGameStats , so
+//     //        when the setInterval is called the setGameStats might not be at the newset state.
+//     //    --> Instead use a simple loop and make the function async and make use of delay() function.
+//
+//     const IntervalId = setInterval(() => {
+//       if (score >= scoreIncrease) {
+//         clearInterval(IntervalId);
+//         resolve();
+//         return;
+//       }
+//
+//       setGameStats((prev) => {
+//         let newGameStats = { ...prev };
+//
+//         if (prev.round === 1) {
+//           newGameStats.r1playerScore += 1;
+//         } else if (prev.round === 2) {
+//           newGameStats.r2playerScore += 1;
+//         } else if (prev.round === 3) {
+//           newGameStats.r3playerScore += 1;
+//         }
+//
+//         newGameStats.playerScore += 1;
+//
+//         return newGameStats;
+//       });
+//       score++;
+//     }, 20);
+//   });
+// };
+
+export const updatePlayerScoreByRowAndChosenCard = async (
+  gameStats,
+  setGameStats,
+  cards,
+  ChosenRow,
+  ChosenCard,
+) => {
+  let scoreIncrease = 0;
+
+  cards.map((card) => {
+    if (card.rowNumber === ChosenRow || card.cardNumber === ChosenCard) {
+      scoreIncrease = getBullHead(card.cardNumber) + scoreIncrease;
+      console.log("Bull Head : ", getBullHead(card.cardNumber));
+      console.log("CARD");
+    }
+  });
+
+  for (let i = 1; i <= scoreIncrease; i++) {
+    await delay(50);
+
+    setGameStats((prev) => {
+      return {
+        ...prev,
+        playerScore: prev.playerScore + 1,
+      };
+    });
+  }
+};
+
+export const updatePlayerScoreByRowAlone = async (
+  gameStats,
+  setGameStats,
+  cards,
+  ChosenRow,
+) => {
+  let scoreIncrease = 0;
+
+  cards.map((card) => {
+    if (card.rowNumber === ChosenRow) {
+      // console.log("CARD : ", card.cardNumber);
+      scoreIncrease = getBullHead(card.cardNumber) + scoreIncrease;
+      // console.log("Bull Head : ", getBullHead(card.cardNumber));
+    }
+  });
+
+  for (let i = 1; i <= scoreIncrease; i++) {
+    await delay(50);
+
+    setGameStats((prev) => {
+      return {
+        ...prev,
+        playerScore: prev.playerScore + 1,
+      };
+    });
+  }
+  // console.log("Score Increase : ", scoreIncrease);
+};
+
+//TODO: Score not getting updated properly.
+//TODO: Redistribution and Next Round.
+//TODO: Add some backend Logic for different algorithms.
