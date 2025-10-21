@@ -82,10 +82,6 @@ export const distributeCards = (cards, setCards) => {
   });
 };
 
-//NOTE: Modified the sendRequestToAi(),
-//Earlier : it sets the new states here.
-//NOW : it return the new state.
-
 export const sendRequestToAi = (cards, setCards, gameStats, setGameStats) => {
   return new Promise((resolve, reject) => {
     const req = convertToJSON(gameStats, cards);
@@ -106,132 +102,6 @@ export const sendRequestToAi = (cards, setCards, gameStats, setGameStats) => {
       .catch((err) => reject(err));
   });
 };
-
-// Called once the hand is emptied.
-//NOTE:  It is assumed that the possiblity of redistribution of cards is checked before calling this function.
-export const redistributeCards = (cards, setCards) => {
-  return new Promise((resolve, reject) => {
-    try {
-      let remainingCards = [];
-      cards.map((card) => {
-        if (card.rowNumber === 6 && !card.isInBullHeadStack)
-          remainingCards.push(card.cardNumber);
-      });
-
-      shuffleArray(remainingCards);
-
-      let temp = cards;
-
-      let redistributeCount = 0;
-
-      const IntervalId = setInterval(() => {
-        if (redistributeCount >= 20) {
-          clearInterval(IntervalId);
-        }
-
-        if (redistributeCount < 10) {
-          temp = temp.map((card) => {
-            if (card.cardNumber === remainingCards[redistributeCount]) {
-              card.rowNumber = 0;
-              card.isInBullHeadStack = false;
-            }
-            return card;
-          });
-        } else if (redistributeCount >= 10 && redistributeCount < 20) {
-          temp = temp.map((card) => {
-            if (card.cardNumber === remainingCards[redistributeCount]) {
-              card.rowNumber = 5;
-              card.isInBullHeadStack = false;
-            }
-          });
-        }
-
-        redistributeCount++;
-
-        setCards(temp);
-      }, 100);
-
-      setCards(temp);
-
-      resolve(cards);
-    } catch (error) {
-      reject(error);
-    }
-  });
-};
-
-//NOTE: No need for them to be Asynchronous.
-//
-// export const getPlayerMaxCardNumber = (cards) => {
-//   return new Promise((resolve, reject) => {
-//     try {
-//       let maxCardNumber = 0;
-//       cards.map((card) => {
-//         if (card.rowNumber === 5 && !card.isInBullHeadStack) {
-//           maxCardNumber = Math.max(maxCardNumber, card.cardNumber);
-//         }
-//       });
-//       if (maxCardNumber === 0) {
-//         reject("Player has no Cards");
-//       }
-//       resolve(maxCardNumber);
-//     } catch (error) {
-//       reject(error);
-//     }
-//   });
-// };
-//
-// // return the last card (maximum card Number) of a row.
-// export const getRowMaxCard = (cards, row) => {
-//   return new Promise((resolve, reject) => {
-//     try {
-//       let maxCardNumber = 0;
-//       cards.map((card) => {
-//         if (card.rowNumber === row) {
-//           maxCardNumber = Math.max(maxCardNumber, card.cardNumber);
-//         }
-//       });
-//       resolve(maxCardNumber);
-//     } catch (error) {
-//       reject(error);
-//     }
-//   });
-// };
-//
-// // returns the minimum of all the last cards of all the rows.
-// export const getMinOfMaxRowCards = (cards) => {
-//   return new Promise((resolve, reject) => {
-//     try {
-//       let r1Last = getRowMaxCard(cards, 1);
-//       let r2Last = getRowMaxCard(cards, 2);
-//       let r3Last = getRowMaxCard(cards, 3);
-//       let r4Last = getRowMaxCard(cards, 4);
-//
-//       let miniRowsLastCard = Math.min(r1Last, r2Last, r3Last, r4Last);
-//
-//       resolve(miniRowsLastCard);
-//     } catch (error) {
-//       reject(error);
-//     }
-//   });
-// };
-//
-// export const checkAllRowsGreaterThanPlayerMaxCardNumber = (cards) => {
-//   return new Promise((resolve, reject) => {
-//     try {
-//       let playerMaxCardNumber = getPlayerMaxCardNumber(cards);
-//       let miniOfMaxRowCardNumber = getMinOfMaxRowCards(cards);
-//
-//       if (miniOfMaxRowCardNumber > playerMaxCardNumber) {
-//         resolve(true);
-//       } else {
-//         reject(false);
-//       }
-//     } catch (error) {
-//       reject(error);
-//     }
-//   });
-// };
 
 //NOTE: GameBoard.jsx Logic helpers .
 
@@ -295,7 +165,7 @@ export const handlePayerMaxiLessThanRows = async (
 
   setIsRowMovedToBullHead(true);
 
-  await delay(2500);
+  await delay(2000);
 
   setIsRowMovedToBullHead(false);
 
@@ -407,130 +277,6 @@ export const displayAIThinkingAnimation = async (gameStats, setGameStats) => {
   });
 };
 
-// export const updatePlayerScoreByRowAndChosenCard = (
-//   gameStats,
-//   setGameStats,
-//   cards,
-//   ChosenRow,
-//   ChosenCard,
-// ) => {
-//   return new Promise((resolve, reject) => {
-//     let scoreIncrease = 0;
-//
-//     cards.map((card) => {
-//       if (card.rowNumber === ChosenRow || card.cardNumber === ChosenCard) {
-//         scoreIncrease += getBullHead(card.cardNumber);
-//       }
-//     });
-//
-//     let score = 0;
-//
-//     const IntervalId = setInterval(() => {
-//       if (score >= scoreIncrease) {
-//         clearInterval(IntervalId);
-//         resolve();
-//         return;
-//       }
-//
-//       setGameStats((prev) => {
-//         let newGameStats = { ...prev };
-//
-//         if (prev.round === 1) {
-//           newGameStats.r1playerScore += 1;
-//         } else if (prev.round === 2) {
-//           newGameStats.r2playerScore += 1;
-//         } else if (prev.round === 3) {
-//           newGameStats.r3playerScore += 1;
-//         }
-//
-//         newGameStats.playerScore += 1;
-//
-//         return newGameStats;
-//       });
-//       score++;
-//     }, 20);
-//   });
-// };
-//
-// export const updatePlayerScoreByRowAlone = (
-//   gameStats,
-//   setGameStats,
-//   cards,
-//   ChosenRow,
-// ) => {
-//   return new Promise((resolve, reject) => {
-//     let scoreIncrease = 0;
-//
-//     cards.map((card) => {
-//       if (card.rowNumber === ChosenRow) {
-//         scoreIncrease += getBullHead(card.cardNumber);
-//       }
-//     });
-//
-//     let score = 0;
-//
-//     //NOTE: This causes Staleness / Does stale updates.
-//     //      --> Here the gameStats might not be having the newest update.
-//     //      --> so use functinoal update in set().
-//
-//     // const IntervalId = setInterval(() => {
-//     //   if (score >= scoreIncrease) {
-//     //     clearInterval(IntervalId);
-//     //   }
-//     //
-//     //   let newGameStats = { ...gameStats };
-//     //
-//     //   newGameStats.playerScore += 1;
-//     //
-//     //   if (gameStats.round === 1) {
-//     //     newGameStats.r1playerScore += 1;
-//     //   } else if (gameStats.round === 2) {
-//     //     newGameStats.r2playerScore += 1;
-//     //   } else if (gameStats.round === 3) {
-//     //     newGameStats.r3playerScore += 1;
-//     //   }
-//     //
-//     //   score++;
-//     //
-//     //   setGameStats(newGameStats);
-//     //   console.log(gameStats.playerScore);
-//     // }, 20);
-//     // resolve();
-//
-//
-//     //NOTE: The below code also doesn't work since :
-//     //    --> The setInterval and setGameStats() are not synchronised.
-//     //    --> Js takes care of setInterval and react takes care of setGameStats , so
-//     //        when the setInterval is called the setGameStats might not be at the newset state.
-//     //    --> Instead use a simple loop and make the function async and make use of delay() function.
-//
-//     const IntervalId = setInterval(() => {
-//       if (score >= scoreIncrease) {
-//         clearInterval(IntervalId);
-//         resolve();
-//         return;
-//       }
-//
-//       setGameStats((prev) => {
-//         let newGameStats = { ...prev };
-//
-//         if (prev.round === 1) {
-//           newGameStats.r1playerScore += 1;
-//         } else if (prev.round === 2) {
-//           newGameStats.r2playerScore += 1;
-//         } else if (prev.round === 3) {
-//           newGameStats.r3playerScore += 1;
-//         }
-//
-//         newGameStats.playerScore += 1;
-//
-//         return newGameStats;
-//       });
-//       score++;
-//     }, 20);
-//   });
-// };
-
 export const updatePlayerScoreByRowAndChosenCard = async (
   gameStats,
   setGameStats,
@@ -552,10 +298,19 @@ export const updatePlayerScoreByRowAndChosenCard = async (
     await delay(50);
 
     setGameStats((prev) => {
-      return {
-        ...prev,
-        playerScore: prev.playerScore + 1,
-      };
+      let newGameStat = { ...prev };
+
+      newGameStat.playerScore++;
+
+      if (newGameStat.round === 1) {
+        newGameStat.r1playerScore++;
+      } else if (newGameStat.round === 2) {
+        newGameStat.r2playerScore++;
+      } else {
+        newGameStat.r3playerScore++;
+      }
+
+      return newGameStat;
     });
   }
 };
@@ -580,15 +335,175 @@ export const updatePlayerScoreByRowAlone = async (
     await delay(50);
 
     setGameStats((prev) => {
-      return {
-        ...prev,
-        playerScore: prev.playerScore + 1,
-      };
+      let newGameStat = { ...prev };
+
+      newGameStat.playerScore++;
+
+      if (newGameStat.round === 1) {
+        newGameStat.r1playerScore++;
+      } else if (newGameStat.round === 2) {
+        newGameStat.r2playerScore++;
+      } else {
+        newGameStat.r3playerScore++;
+      }
+
+      return newGameStat;
     });
   }
   // console.log("Score Increase : ", scoreIncrease);
 };
 
-//TODO: Score not getting updated properly.
-//TODO: Redistribution and Next Round.
-//TODO: Add some backend Logic for different algorithms.
+//TODO: ADD score updation sounds.
+//TODO: Add the 6th Card placed dialog Box .
+//TODO: Add some backend Logic for different algorithms .
+//TODO: Add Undo / Redo Options .
+
+export const checkRedistribution = (cards) => {
+  let remainingCards = 0;
+
+  let playerCards = 0;
+
+  cards.map((card) => {
+    if (card.rowNumber === 6) {
+      remainingCards++;
+    }
+    if (card.rowNumber === 5 && !card.isInBullHeadStack) {
+      playerCards++;
+    }
+  });
+
+  if (playerCards > 0) return false;
+
+  return remainingCards >= 20;
+};
+
+export const handleRedistribution = async (
+  cards,
+  setCards,
+  gameStats,
+  setGameStats,
+) => {
+  // Just going with absolut brute force her since , its just 104 cards .
+
+  let remainingCards = [];
+
+  cards.map((card) => {
+    if (card.rowNumber === 6) {
+      remainingCards.push(card.cardNumber);
+    }
+  });
+
+  shuffleArray(remainingCards);
+
+  await delay(1000);
+
+  // set the first 10 to AI & the next 10 to player like in distribution .
+
+  for (let i = 0; i < 20; i++) {
+    await delay(100);
+    if (i < 10) {
+      // AI hand
+
+      setCards((prev) => {
+        let newCards = [...prev];
+        newCards = newCards.map((card) => {
+          if (card.cardNumber === remainingCards[i]) {
+            card.rowNumber = 0;
+            card.isInBullHeadStack = false;
+            card.isInDrawPile = false;
+          }
+          return card;
+        });
+        return newCards;
+      });
+    } else {
+      // Player Hand
+
+      setCards((prev) => {
+        let newCards = [...prev];
+        newCards = newCards.map((card) => {
+          if (card.cardNumber === remainingCards[i]) {
+            card.rowNumber = 5;
+            card.isInBullHeadStack = false;
+            card.isInDrawPile = false;
+          }
+          return card;
+        });
+
+        return newCards;
+      });
+    }
+  }
+};
+
+export const checkNextRound = (cards) => {
+  let playerCards = 0;
+  let remainingCards = 0;
+
+  cards.map((card) => {
+    if (card.rowNumber === 6) remainingCards++;
+    if (card.rowNumber === 5 && !card.isInBullHeadStack) playerCards++;
+  });
+
+  if (remainingCards > 20 || playerCards > 0) return false;
+
+  return true;
+};
+
+export const handleNextRound = async (
+  cards,
+  setCards,
+  gameStats,
+  setGameStats,
+  setIsRoundOver,
+  setIsRoundWin,
+) => {
+  // Before moving on to the next round display the result of the current round win / loss .
+  // update the gameStats
+
+  // set the isRoundOver
+
+  if (gameStats.round === 1) {
+    if (gameStats.r1playerScore > gameStats.r1aiScore) {
+      setIsRoundWin(true);
+    } else {
+      setIsRoundWin(false);
+    }
+
+    setIsRoundOver(true);
+
+    await delay(3000);
+
+    setIsRoundOver(false);
+
+    setGameStats((prev) => {
+      let newGameStat = { ...prev };
+      newGameStat.round++;
+      return newGameStat;
+    });
+
+    distributeCards(cards, setCards);
+  } else if (gameStats.round === 2) {
+    if (gameStats.r2playerScore > gameStats.r2aiScore) {
+      setIsRoundWin(true);
+    } else {
+      setIsRoundWin(false);
+    }
+
+    setIsRoundOver(true);
+
+    await delay(3000);
+
+    setIsRoundOver(false);
+
+    setGameStats((prev) => {
+      let newGameStat = { ...prev };
+      newGameStat.round++;
+      return newGameStat;
+    });
+
+    distributeCards(cards, setCards);
+  } else if (gameStats.round === 3) {
+    // no Next Round , Game Over .
+  }
+};

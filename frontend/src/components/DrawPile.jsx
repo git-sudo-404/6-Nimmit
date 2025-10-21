@@ -12,7 +12,7 @@ const DrawPile = ({ cards, setCards, gameStats, setGameStats }) => {
     }
   };
 
-  console.log(gameStats.playerScore);
+  // console.log(gameStats.playerScore);
 
   return (
     <>

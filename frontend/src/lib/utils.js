@@ -79,41 +79,54 @@ export const convertToJSON = (gameStats, cards) => {
   return resp;
 };
 
-export const setNewGameState = (
+export const setNewGameState = async (
   gameStats,
   setGameStats,
   cards,
   setCards,
   data,
 ) => {
-  return new Promise((resolve, reject) => {
-    try {
-      let newGameStats = { ...gameStats };
-      newGameStats.round = data.round;
-      newGameStats.r1aiScore = data.r1aiScore;
-      newGameStats.r2aiScore = data.r2aiScore;
-      newGameStats.r3aiScore = data.r3aiScore;
-      newGameStats.r1playerScore = data.r1playerScore;
-      newGameStats.r2playerScore = data.r2playerScore;
-      newGameStats.r3playerScore = data.r3playerScore;
-      newGameStats.aiScore = data.aiScore;
-      newGameStats.playerScore = data.playerScore;
-      newGameStats.aiWon = data.aiWon;
-      newGameStats.r1playerWon = data.r1playerWon;
-      newGameStats.r2playerWon = data.r2playerWon;
-      newGameStats.r3playerWon = data.r3playerWon;
+  try {
+    let newGameStats = { ...gameStats };
+    newGameStats.round = data.round;
+    newGameStats.r1aiScore = data.r1aiScore;
+    newGameStats.r2aiScore = data.r2aiScore;
+    newGameStats.r3aiScore = data.r3aiScore;
+    newGameStats.r1playerScore = data.r1playerScore;
+    newGameStats.r2playerScore = data.r2playerScore;
+    newGameStats.r3playerScore = data.r3playerScore;
+    newGameStats.aiScore = data.aiScore;
+    newGameStats.playerScore = data.playerScore;
+    newGameStats.aiWon = data.aiWon;
+    newGameStats.r1playerWon = data.r1playerWon;
+    newGameStats.r2playerWon = data.r2playerWon;
+    newGameStats.r3playerWon = data.r3playerWon;
 
-      setGameStats(newGameStats);
+    // setGameStats(newGameStats);
+    // Update the gameStat for the score to rerender again & again for the animation.
 
-      let newCards = data.cards;
+    let scoreIncrease = newGameStats.aiScore - gameStats.aiScore;
 
-      setCards(newCards);
-
-      resolve();
-    } catch (error) {
-      reject(error);
+    for (let i = 0; i < scoreIncrease; i++) {
+      await delay(50);
+      let ngameStats = { ...newGameStats };
+      ngameStats.aiScore++;
+      if (ngameStats.round === 1) {
+        ngameStats.r1aiScore++;
+      } else if (ngameStats.round === 2) {
+        ngameStats.r2aiScore++;
+      } else {
+        ngameStats.r3aiScore++;
+      }
+      setGameStats(ngameStats);
     }
-  });
+
+    let newCards = data.cards;
+
+    setCards(newCards);
+  } catch (error) {
+    console.log("Error in utils ai state update : ", error);
+  }
 };
 
 export const getBullHead = (cardNumber) => {

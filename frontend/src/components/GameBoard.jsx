@@ -21,6 +21,10 @@ import {
   handlePlayerPlacedSixthCard,
   sendRequestToAi,
   displayAIThinkingAnimation,
+  checkRedistribution,
+  handleRedistribution,
+  checkNextRound,
+  handleNextRound,
 } from "../lib/GameLogic.js";
 import { delay } from "../lib/utils.js";
 
@@ -58,6 +62,9 @@ const GameBoard = () => {
   const [isRowMovedToBullHead, setIsRowMovedToBullHead] = useState(false);
   const [isSixthCardMovedToBullHead, setIsSixthCardMovedToBullHead] =
     useState(false);
+
+  const [isRoundOver, setIsRoundOver] = useState(false);
+  const [isRoundWin, setIsRoundWin] = useState(false);
 
   const gameStatsRef = useRef(gameStats);
   const cardsRef = useRef(cards);
@@ -195,7 +202,7 @@ const GameBoard = () => {
         handleDropAudioRef(dropCardAudioRef);
 
         await delay(1000);
-        console.log("Before req : ", gameStats.playerScore);
+        // console.log("Before req : ", gameStats.playerScore);
         await sendRequestToAi(
           cardsRef.current,
           setCards,
@@ -203,7 +210,28 @@ const GameBoard = () => {
           setGameStats,
         );
 
-        // Need to work on Redistribution .
+        // Redistribution
+
+        if (checkRedistribution(cardsRef.current)) {
+          await handleRedistribution(
+            cardsRef.current,
+            setCards,
+            gameStats,
+            setGameStats,
+          );
+        }
+
+        // New Round .
+        else if (checkNextRound(cards)) {
+          await handleNextRound(
+            cardsRef.current,
+            setCards,
+            gameStatsRef.current,
+            setGameStats,
+            setIsRoundOver,
+            setIsRoundWin,
+          );
+        }
 
         break;
       }
@@ -219,9 +247,6 @@ const GameBoard = () => {
     }
   };
 
-  const [isRoundOver, setIsRoundOver] = useState(false);
-  let win = false;
-
   return (
     <>
       {isInValidMove ? <InValidMove /> : null}
@@ -229,7 +254,7 @@ const GameBoard = () => {
       {isSixthCardMovedToBullHead ? <SixthCardMovedToBullHead /> : null}
       {isRoundOver ? (
         <RoundOver
-          win={win}
+          win={isRoundWin}
           isRoundOver={isRoundOver}
           setIsRoundOver={setIsRoundOver}
         />
