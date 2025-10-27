@@ -85,6 +85,7 @@ export const setNewGameState = async (
   cards,
   setCards,
   data,
+  handleScoreIncreaseAudio,
 ) => {
   try {
     let newGameStats = { ...gameStats };
@@ -119,6 +120,7 @@ export const setNewGameState = async (
         ngameStats.r3aiScore++;
       }
       setGameStats(ngameStats);
+      handleScoreIncreaseAudio();
     }
 
     let newCards = data.cards;

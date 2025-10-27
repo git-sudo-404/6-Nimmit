@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Dict, Optional, Tuple
+from MCTS import calculate_MCTS
 
 # ==============================================================================
 # 1. FastAPI APP SETUP AND PYDANTIC MODELS (Unchanged)
@@ -272,7 +273,7 @@ def find_best_move_mcts(initial_state: State) -> Card:
 # 4. MAIN GAME CONTROLLER AND API ENDPOINT
 # ==============================================================================
 
-def calculate_MCTS(state: State) -> State:
+def calculate_final_turn(state: State) -> State:
     """
     The main function that is called by the API. It determines the AI's move
     and then resolves the turn with the player's actual move.
@@ -318,6 +319,11 @@ async def process_request(state: State):
     """
     if state.hasEnded:
         return state
-        
+
     next_state = calculate_final_turn(state)
+    
+    if(state.aiAlgo==2){
+        next_state = calculate_MCTS(state)
+
+    }
     return next_state

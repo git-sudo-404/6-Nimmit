@@ -41,13 +41,23 @@ const AlgoSelector = ({ gameStats, setGameStats }) => {
         <div className="row-span-1 border border-black border-dashed w-full h-full rounded-xl flex justify-center items-center bg-black/70  hover:bg-black hover:border-white hover:text-xl transition-all">
           Algorithm
         </div>
-        <div className="row-span-2 w-full h-full border border-dashed rounded-2xl bg-blue-900/40 border-blue-900 flex items-center justify-center hover:bg-blue-900 hover:border-white hover:text-xl transition-all">
+        {/* <div className="row-span-2 w-full h-full border border-dashed rounded-2xl bg-blue-900/40 border-blue-900 flex items-center justify-center hover:bg-blue-900 hover:border-white hover:text-xl transition-all"> */}
+
+        <div
+          className={`
+    row-span-2 w-full h-full border border-dashed rounded-2xl border-green-900 
+    flex items-center justify-center pl-5 
+    hover:bg-blue-900 hover:border-white hover:text-xl transition-all
+    ${gameStats.aiAlgo === 1 ? "bg-blue-900 border-dashed border-white border" : "bg-blue-900/40"}
+  `}
+        >
           <button
             onClick={() => {
               setGameStats((prev) => ({
                 ...prev,
                 aiAlgo: 1,
               }));
+              console.log("CLICKED!", gameStats.aiAlgo);
               handleClickSound();
             }}
             onMouseEnter={handleHoverSound}
@@ -55,7 +65,16 @@ const AlgoSelector = ({ gameStats, setGameStats }) => {
             Expectiminimax
           </button>
         </div>
-        <div className="row-span-2 w-full h-full border border-dashed rounded-2xl bg-green-900/40 border-green-900 flex items-center justify-center  pl-5 hover:bg-green-900 hover:border-white hover:text-xl transition-all">
+        {/* <div style={{gameStats.aiAlgo===2 ? bg:green-900 : null}} className="row-span-2 w-full h-full border border-dashed rounded-2xl bg-green-900/40 border-green-900 flex items-center justify-center  pl-5 hover:bg-green-900 hover:border-white hover:text-xl transition-all"> */}
+
+        <div
+          className={`
+    row-span-2 w-full h-full border border-dashed rounded-2xl border-green-900 
+    flex items-center justify-center pl-5 
+    hover:bg-green-900 hover:border-white hover:text-xl transition-all
+    ${gameStats.aiAlgo === 2 ? "bg-green-900 border-dashed border-white border" : "bg-green-900/40"}
+  `}
+        >
           <button
             onClick={() => {
               setGameStats((prev) => ({
@@ -63,6 +82,7 @@ const AlgoSelector = ({ gameStats, setGameStats }) => {
                 aiAlgo: 2,
               }));
               handleClickSound();
+              console.log("CLICKED!", gameStats.aiAlgo);
             }}
             onMouseEnter={handleHoverSound}
           >

@@ -28,6 +28,7 @@ import {
 } from "../lib/GameLogic.js";
 import { delay } from "../lib/utils.js";
 import RedistributingCards from "./RedistributingCards.jsx";
+import Defeat from "./Defeat.jsx";
 
 const GameBoard = () => {
   const [cards, setCards] = useState([]);
@@ -57,6 +58,7 @@ const GameBoard = () => {
   });
 
   const buttonRef = useRef(null);
+  const scoreIncreaseRef = useRef(null);
   const [activeId, setActiveId] = useState(null);
 
   const [isInValidMove, setIsInValidMove] = useState(false);
@@ -203,13 +205,14 @@ const GameBoard = () => {
 
         handleDropAudioRef(dropCardAudioRef);
 
-        await delay(1000);
+        await delay(1500);
         // console.log("Before req : ", gameStats.playerScore);
         await sendRequestToAi(
           cardsRef.current,
           setCards,
           gameStatsRef.current,
           setGameStats,
+          handleScoreIncreaseAudio,
         );
 
         // Redistribution
@@ -250,6 +253,14 @@ const GameBoard = () => {
     }
   };
 
+  const handleScoreIncreaseAudio = () => {
+    if (scoreIncreaseRef.current) {
+      scoreIncreaseRef.current.currentTime = 0;
+      scoreIncreaseRef.current.play();
+      console.log("Score Increase Audio Called");
+    }
+  };
+
   return (
     <>
       {isInValidMove ? <InValidMove /> : null}
@@ -264,6 +275,7 @@ const GameBoard = () => {
         />
       ) : null}
       <audio ref={bgmAudioRef} src="/sound/music1.ogg" preload="auto" loop />
+      <audio ref={scoreIncreaseRef} src="/sound/coin2.igg" preload="auto" />
       {!gameStats.hasStarted ? (
         <GameStartBox
           handleTestAudio={handleTestAudio}

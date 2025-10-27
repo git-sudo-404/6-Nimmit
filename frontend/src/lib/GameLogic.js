@@ -82,7 +82,13 @@ export const distributeCards = (cards, setCards) => {
   });
 };
 
-export const sendRequestToAi = (cards, setCards, gameStats, setGameStats) => {
+export const sendRequestToAi = (
+  cards,
+  setCards,
+  gameStats,
+  setGameStats,
+  handleScoreIncreaseAudio,
+) => {
   return new Promise((resolve, reject) => {
     const req = convertToJSON(gameStats, cards);
     console.log("Request sent to AI : ", req);
@@ -95,7 +101,14 @@ export const sendRequestToAi = (cards, setCards, gameStats, setGameStats) => {
     })
       .then((res) => res.json())
       .then((data) =>
-        setNewGameState(gameStats, setGameStats, cards, setCards, data)
+        setNewGameState(
+          gameStats,
+          setGameStats,
+          cards,
+          setCards,
+          data,
+          handleScoreIncreaseAudio,
+        )
           .then(() => resolve())
           .catch((err) => reject(err)),
       )
