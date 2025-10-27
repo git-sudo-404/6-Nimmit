@@ -92,7 +92,8 @@ export const sendRequestToAi = (
   return new Promise((resolve, reject) => {
     const req = convertToJSON(gameStats, cards);
     console.log("Request sent to AI : ", req);
-    fetch("http://localhost:8000/", {
+    // fetch("/process", {
+    fetch(`${window.location.origin}/process/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
