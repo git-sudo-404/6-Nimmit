@@ -1,4 +1,4 @@
-## (Deployed app link)[https://six-nimmt-backend-render.onrender.com/]
+## [Deployed app link](https://six-nimmt-backend-render.onrender.com/)
 
 ## Installation and Setup :
 
